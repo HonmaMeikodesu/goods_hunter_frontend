@@ -14,30 +14,104 @@ class AuthenticationRoute extends StatefulWidget {
 class _AuthenticationRouterState extends State<AuthenticationRoute> {
 
   AuthenticationMode loginOrRegister = AuthenticationMode.login;
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final GlobalKey<FormState> _registerFormKey = GlobalKey<FormState>();
+  final GlobalKey<FormState> _loginFormKey = GlobalKey<FormState>();
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text("注册/登陆")),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: (
-          RegisterRouter(
-            formKey: _formKey,
-          )
+    return DefaultTabController(
+        length: 2,
+        child: Scaffold(
+          appBar: AppBar(
+              title: const Text("Welcome to goods hunter!"),
+              bottom: const TabBar(
+                tabs: <Widget>[
+                  Tab(text: "登录"),
+                  Tab(text: "注册")
+                ],
+              )
+          ),
+          body: Padding(
+            padding: const EdgeInsets.all(16),
+            child: (
+              TabBarView(
+                  children: <Widget>[
+                    LoginRouter(formKey: _loginFormKey),
+                    RegisterRouter(
+                      formKey: _registerFormKey,
+                    ),
+                  ]
+              )
+            ),
+          ),
         ),
-      ),
     );
   }
 }
 
-class LoginRoute extends StatelessWidget {
+class LoginRouter extends StatelessWidget {
 
+  LoginRouter({Key? key, required this.formKey}): super(key: key);
 
+  GlobalKey<FormState> formKey;
+
+  String email = "";
+  String password = "";
 
   @override
   Widget build(BuildContext context) {
-    return Text("123");
+    return Center(
+      child: Form(
+        key: formKey,
+        child: Column(
+          children: [
+            TextFormField(
+              autofocus: true,
+              keyboardType: TextInputType.emailAddress,
+              textInputAction: TextInputAction.next,
+              decoration: const InputDecoration(
+                icon: Icon(Icons.email, color: Colors.blue),
+                labelText: "邮箱",
+                hintText: "请输入邮箱地址",
+              ),
+              validator: (v) {
+                return (v != null && EmailValidator.validate(v.trim())) ? null : "邮箱地址不合法";
+              },
+              onChanged: (v) {
+                email = v.trim();
+              },
+            ),
+            TextFormField(
+              keyboardType: TextInputType.text,
+              textInputAction: TextInputAction.next,
+              decoration: const InputDecoration(
+                  icon: Icon(Icons.password, color: Colors.blue),
+                  labelText: "密码",
+                  hintText: "请输入密码"
+              ),
+              validator: (v) {
+                var reg = RegExp(r"^\w{6,}$");
+                return (v != null && reg.hasMatch(v)) ? null : "密码不合法";
+              },
+              onChanged: (v) {
+                password = v;
+              },
+            ),
+            Padding(
+              padding: EdgeInsets.all(16),
+              child: Row(
+                children: [
+                  ElevatedButton(onPressed: (){
+                    if(formKey.currentState!.validate()) {
+                      print("submitted");
+                    }
+                  }, child: const Text("登录"))
+                ],
+              ),
+            )
+          ],
+        ),
+      ),
+    );
   }
 }
 
@@ -68,10 +142,10 @@ class RegisterRouter extends StatelessWidget {
                 hintText: "请输入你的常用邮箱",
               ),
               validator: (v) {
-                return EmailValidator.validate(v!.trim()) ? null : "邮箱地址不合法,请重新输入";
+                return (v != null &&  EmailValidator.validate(v.trim())) ? null : "邮箱地址不合法,请重新输入";
               },
               onChanged: (v) {
-                email = v!.trim();
+                email = v.trim();
               },
             ),
             TextFormField(
@@ -84,7 +158,7 @@ class RegisterRouter extends StatelessWidget {
               ),
               validator: (v) {
                 var reg = RegExp(r"^\w{6,}$");
-                return reg.hasMatch(v!) ? null : "密码不合法,请重新输入";
+                return (v != null && reg.hasMatch(v)) ? null : "密码不合法,请重新输入";
               },
               onChanged: (v) {
                 password = v;
