@@ -18,7 +18,7 @@ class HonmaMeikoInterceptor extends Interceptor {
     if (resp.code != "200") {
       return handler.reject(DioError(requestOptions: response.requestOptions, error: resp.data));
     }
-    return handler.next(response);
+    return handler.resolve(response);
   }
 }
 
@@ -26,7 +26,7 @@ class Request {
   static late final Dio _dio;
   static Future<void> init() async {
     BaseOptions baseOptions = BaseOptions(
-      baseUrl: "http://127.0.0.1",
+      baseUrl: "http://127.0.0.1:7001",
       connectTimeout: 5000,
       receiveTimeout: 10000,
       sendTimeout: 5000,
@@ -40,5 +40,14 @@ class Request {
   static Future<void> initPromise = init();
   static Future<Dio> getInstance() {
     return initPromise.then((value) => _dio);
+  }
+  static Future<T> fetch<T>(String path, {
+    data,
+    Map<String, dynamic>? queryParameters,
+    Options? options,
+  }) async {
+    var requestInstance = await Request.getInstance();
+    var rawResponse = await requestInstance.request<T>(path, data: data, options: options, queryParameters: queryParameters);
+    return rawResponse.data!;
   }
 }
