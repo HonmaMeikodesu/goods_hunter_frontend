@@ -16,7 +16,7 @@ class HonmaMeikoInterceptor extends Interceptor {
   void onResponse(Response response, ResponseInterceptorHandler handler) {
     Model.Response resp = Model.Response.fromJson(response.data);
     if (resp.code != "200") {
-      return handler.reject(DioError(requestOptions: response.requestOptions, error: resp.data));
+      return handler.reject(DioError(requestOptions: response.requestOptions, error: resp.data ?? "Unknown Error From Server side"));
     }
     return handler.next(response);
   }
