@@ -18,7 +18,7 @@ class HonmaMeikoInterceptor extends Interceptor {
     if (resp.code != "200") {
       return handler.reject(DioError(requestOptions: response.requestOptions, error: resp.data));
     }
-    return handler.resolve(response);
+    return handler.next(response);
   }
 }
 
