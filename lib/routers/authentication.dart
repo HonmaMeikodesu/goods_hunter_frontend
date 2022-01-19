@@ -15,8 +15,7 @@ class AuthenticationRoute extends StatefulWidget {
 class _AuthenticationRouterState extends State<AuthenticationRoute> {
 
   AuthenticationMode loginOrRegister = AuthenticationMode.login;
-  final GlobalKey<FormState> _registerFormKey = GlobalKey<FormState>();
-  final GlobalKey<FormState> _loginFormKey = GlobalKey<FormState>();
+
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
@@ -31,15 +30,13 @@ class _AuthenticationRouterState extends State<AuthenticationRoute> {
                 ],
               )
           ),
-          body: Padding(
-            padding: const EdgeInsets.all(16),
+          body: const Padding(
+            padding: EdgeInsets.all(16),
             child: (
               TabBarView(
                   children: <Widget>[
-                    LoginRouter(formKey: _loginFormKey),
-                    RegisterRouter(
-                      formKey: _registerFormKey,
-                    ),
+                    LoginRouter(),
+                    RegisterRouter(),
                   ]
               )
             ),
@@ -49,17 +46,13 @@ class _AuthenticationRouterState extends State<AuthenticationRoute> {
   }
 }
 
-class LoginRouter extends StatelessWidget {
-
-  LoginRouter({Key? key, required this.formKey}): super(key: key);
-
-  GlobalKey<FormState> formKey;
+class _LoginRouterState extends State<LoginRouter> {
 
   String email = "";
   String password = "";
 
-  void onLoginSubmitted() {
-    if(formKey.currentState!.validate()) {
+  void onLoginSubmitted(BuildContext context) {
+    if(Form.of(context)!.validate()) {
       loginApi(email: email, password: password).then((value) => print("success"));
     }
   }
@@ -68,7 +61,6 @@ class LoginRouter extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: Form(
-        key: formKey,
         child: Column(
           children: [
             TextFormField(
@@ -85,7 +77,9 @@ class LoginRouter extends StatelessWidget {
                 return (v != null && EmailValidator.validate(v.trim())) ? null : "邮箱地址不合法";
               },
               onChanged: (v) {
-                email = v.trim();
+                setState(() {
+                  email = v.trim();
+                });
               },
             ),
             TextFormField(
@@ -106,18 +100,22 @@ class LoginRouter extends StatelessWidget {
               },
               obscureText: true,
               onChanged: (v) {
-                password = v;
+                setState(() {
+                  password = v;
+                });
               },
             ),
             Padding(
-              padding: EdgeInsets.all(16),
+              padding: const EdgeInsets.all(16),
               child: Row(
                 children: [
-                  ElevatedButton(onPressed: (){
-                    if(formKey.currentState!.validate()) {
-                      onLoginSubmitted();
-                    }
-                  }, child: const Text("登录"))
+                  Builder(builder: (context) {
+                    return ElevatedButton(onPressed: (){
+                      if(Form.of(context)!.validate()) {
+                        onLoginSubmitted(context);
+                      }
+                    }, child: const Text("登录"));
+                  })
                 ],
               ),
             )
@@ -128,17 +126,20 @@ class LoginRouter extends StatelessWidget {
   }
 }
 
-class RegisterRouter extends StatelessWidget {
+class LoginRouter extends StatefulWidget {
+  const LoginRouter({Key? key}) : super(key: key);
 
-  RegisterRouter({Key? key, required this.formKey}): super(key: key);
+  @override
+  State<LoginRouter> createState() => _LoginRouterState();
+}
 
-  GlobalKey<FormState> formKey;
 
+class _RegisterRouterState extends State<RegisterRouter> {
   String email = "";
   String password = "";
 
-  void onRegisterSubmitted() {
-    if(formKey.currentState!.validate()) {
+  void onRegisterSubmitted(BuildContext context) {
+    if(Form.of(context)!.validate()) {
       registerApi(email: email, password: password).then((value) => print("success"));
     }
   }
@@ -148,7 +149,6 @@ class RegisterRouter extends StatelessWidget {
 
     return Center(
       child: Form(
-        key: formKey,
         child: Column(
           children: [
             TextFormField(
@@ -165,16 +165,18 @@ class RegisterRouter extends StatelessWidget {
                 return (v != null &&  EmailValidator.validate(v.trim())) ? null : "邮箱地址不合法,请重新输入";
               },
               onChanged: (v) {
-                email = v.trim();
+                setState(() {
+                  email = v.trim();
+                });
               },
             ),
             TextFormField(
               keyboardType: TextInputType.visiblePassword,
               textInputAction: TextInputAction.next,
               decoration: const InputDecoration(
-                icon: Icon(Icons.password),
-                labelText: "密码",
-                hintText: "请输入你的密码,密码长度因大于等于6的中英文字符"
+                  icon: Icon(Icons.password),
+                  labelText: "密码",
+                  hintText: "请输入你的密码,密码长度应是大于等于6的中英文字符"
               ),
               autovalidateMode: AutovalidateMode.onUserInteraction,
               validator: (v) {
@@ -183,7 +185,9 @@ class RegisterRouter extends StatelessWidget {
               },
               obscureText: true,
               onChanged: (v) {
-                password = v;
+                setState(() {
+                  password = v;
+                });
               },
             ),
             TextFormField(
@@ -204,11 +208,14 @@ class RegisterRouter extends StatelessWidget {
               padding: EdgeInsets.all(16),
               child: Row(
                 children: [
-                  ElevatedButton(onPressed: (){
-                    if(formKey.currentState!.validate()) {
-                      onRegisterSubmitted();
-                    }
-                  }, child: const Text("注册"))
+                  Builder(builder: (context) {
+                    return ElevatedButton(onPressed: (){
+                      if(Form.of(context)!.validate()) {
+                        onRegisterSubmitted(context);
+                      }
+                    }, child: const Text("注册"));
+                  })
+
                 ],
               ),
             )
@@ -217,4 +224,10 @@ class RegisterRouter extends StatelessWidget {
       ),
     );
   }
+}
+class RegisterRouter extends StatefulWidget {
+  const RegisterRouter({Key? key}) : super(key: key);
+
+  @override
+  State<RegisterRouter> createState() => _RegisterRouterState();
 }
