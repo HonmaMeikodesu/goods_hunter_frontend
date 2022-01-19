@@ -3,6 +3,8 @@ import 'dart:io';
 import "package:dio/dio.dart";
 import "package:cookie_jar/cookie_jar.dart";
 import "package:dio_cookie_manager/dio_cookie_manager.dart";
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import "../models/index.dart" as Model;
 
@@ -41,13 +43,40 @@ class Request {
   static Future<Dio> getInstance() {
     return initPromise.then((value) => _dio);
   }
-  static Future<T> fetch<T>(String path, {
+  static Future<T?> fetch<T>(String path, {
     data,
     Map<String, dynamic>? queryParameters,
     Options? options,
+    BuildContext? context,
   }) async {
-    var requestInstance = await Request.getInstance();
-    var rawResponse = await requestInstance.request<T>(path, data: data, options: options, queryParameters: queryParameters);
-    return rawResponse.data!;
+    try {
+      var requestInstance = await Request.getInstance();
+      var rawResponse = await requestInstance.request<T>(path, data: data, options: options, queryParameters: queryParameters);
+      return rawResponse.data!;
+    } on DioError catch (e) {
+      if (context is BuildContext) {
+        final scaffoldMessenger = ScaffoldMessenger.of(context);
+        bool isScaffoldAvailable = scaffoldMessenger is ScaffoldMessenger;
+        final errorMsg = "请求失败, 错误信息:${e.message}";
+        if (isScaffoldAvailable) {
+          scaffoldMessenger.showSnackBar(SnackBar(content: Text(errorMsg)));
+        } else {
+          showDialog(context: context, builder: (context) {
+            return AlertDialog(
+              content: Column(
+                children: [
+                  const Center(
+                    child: Icon(Icons.error),
+                  ),
+                  Text(errorMsg)
+                ],
+              ),
+            );
+          });
+        }
+      } else {
+        rethrow;
+      }
+    }
   }
 }

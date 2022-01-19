@@ -12,6 +12,28 @@ class AuthenticationRoute extends StatefulWidget {
   _AuthenticationRouterState createState() => _AuthenticationRouterState();
 }
 
+void _showLoading(BuildContext context, String title) {
+  showDialog(context: context, barrierDismissible: false, builder: (context) {
+    return AlertDialog(
+      content: Column(
+        children: [
+          const CircularProgressIndicator(),
+          Padding(
+            padding: const EdgeInsets.only(top: 26.0),
+            child: Text(title),
+          )
+        ],
+      ),
+    );
+  });
+}
+
+void _showSuccess({required BuildContext context,required String title, required void callback()}) {
+  ScaffoldMessenger.of(context)
+    .showSnackBar(SnackBar(content: Text(title)))
+      .closed.then((value) => callback());
+}
+
 class _AuthenticationRouterState extends State<AuthenticationRoute> {
 
   AuthenticationMode loginOrRegister = AuthenticationMode.login;
@@ -140,7 +162,11 @@ class _RegisterRouterState extends State<RegisterRouter> {
 
   void onRegisterSubmitted(BuildContext context) {
     if(Form.of(context)!.validate()) {
-      registerApi(email: email, password: password).then((value) => print("success"));
+      _showLoading(context, "登录中");
+      registerApi(email: email, password: password).then((_) {
+        Navigator.of(context).pop();
+        _showSuccess(context: context, title: "登录成功", callback:  (){ Navigator.pop(context); });
+      });
     }
   }
 
