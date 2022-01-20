@@ -3,8 +3,6 @@ import 'package:email_validator/email_validator.dart';
 import 'package:goods_hunter/api/index.dart';
 
 
-enum AuthenticationMode { login, register }
-
 class AuthenticationRoute extends StatefulWidget {
   const AuthenticationRoute({Key? key}): super(key: key);
 
@@ -16,6 +14,7 @@ void _showLoading(BuildContext context, String title) {
   showDialog(context: context, barrierDismissible: false, builder: (context) {
     return AlertDialog(
       content: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
           const CircularProgressIndicator(),
           Padding(
@@ -35,8 +34,6 @@ void _showSuccess({required BuildContext context,required String title, required
 }
 
 class _AuthenticationRouterState extends State<AuthenticationRoute> {
-
-  AuthenticationMode loginOrRegister = AuthenticationMode.login;
 
   @override
   Widget build(BuildContext context) {
@@ -73,9 +70,16 @@ class _LoginRouterState extends State<LoginRouter> {
   String email = "";
   String password = "";
 
-  void onLoginSubmitted(BuildContext context) {
+  void onLoginSubmitted(BuildContext context) async {
+    _showLoading(context, "登录中");
     if(Form.of(context)!.validate()) {
-      loginApi(email: email, password: password).then((value) => print("success"));
+      try {
+        await loginApi(email: email, password: password, context: context).then((_) {
+          _showSuccess(context: context, title: "登录成功", callback:  (){ Navigator.pop(context); });
+        });
+      } finally {
+        Navigator.of(context).pop();
+      }
     }
   }
 
@@ -160,13 +164,18 @@ class _RegisterRouterState extends State<RegisterRouter> {
   String email = "";
   String password = "";
 
-  void onRegisterSubmitted(BuildContext context) {
+  void onRegisterSubmitted(BuildContext context) async {
     if(Form.of(context)!.validate()) {
-      _showLoading(context, "登录中");
-      registerApi(email: email, password: password).then((_) {
+      _showLoading(context, "注册中");
+      try {
+        await registerApi(email: email, password: password, context: context).then((_) {
+          _showSuccess(context: context, title: "注册成功", callback:  (){
+            DefaultTabController.of(context)?.index = 0;
+          });
+        });
+      } finally {
         Navigator.of(context).pop();
-        _showSuccess(context: context, title: "登录成功", callback:  (){ Navigator.pop(context); });
-      });
+      }
     }
   }
 

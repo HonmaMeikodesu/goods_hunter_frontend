@@ -3,8 +3,8 @@ import 'dart:io';
 import "package:dio/dio.dart";
 import "package:cookie_jar/cookie_jar.dart";
 import "package:dio_cookie_manager/dio_cookie_manager.dart";
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:goods_hunter/private.dart';
 import 'package:path_provider/path_provider.dart';
 import "../models/index.dart" as Model;
 
@@ -18,7 +18,7 @@ class HonmaMeikoInterceptor extends Interceptor {
   void onResponse(Response response, ResponseInterceptorHandler handler) {
     Model.Response resp = Model.Response.fromJson(response.data);
     if (resp.code != "200") {
-      return handler.reject(DioError(requestOptions: response.requestOptions, error: resp.data ?? "Unknown Error From Server side"));
+      return handler.reject(DioError(requestOptions: response.requestOptions, error: resp.code));
     }
     return handler.next(response);
   }
@@ -28,7 +28,7 @@ class Request {
   static late final Dio _dio;
   static Future<void> init() async {
     BaseOptions baseOptions = BaseOptions(
-      baseUrl: "http://127.0.0.1:7001",
+      baseUrl: serverHost,
       connectTimeout: 5000,
       receiveTimeout: 10000,
       sendTimeout: 5000,
@@ -55,15 +55,15 @@ class Request {
       return rawResponse.data!;
     } on DioError catch (e) {
       if (context is BuildContext) {
-        final scaffoldMessenger = ScaffoldMessenger.of(context);
-        bool isScaffoldAvailable = scaffoldMessenger is ScaffoldMessenger;
         final errorMsg = "请求失败, 错误信息:${e.message}";
-        if (isScaffoldAvailable) {
-          scaffoldMessenger.showSnackBar(SnackBar(content: Text(errorMsg)));
-        } else {
+        try {
+          final scaffoldMessengerState = ScaffoldMessenger.of(context);
+          scaffoldMessengerState.showSnackBar(SnackBar(content: Text(errorMsg)));
+        } catch (e) {
           showDialog(context: context, builder: (context) {
             return AlertDialog(
               content: Column(
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   const Center(
                     child: Icon(Icons.error),
@@ -74,9 +74,8 @@ class Request {
             );
           });
         }
-      } else {
-        rethrow;
       }
+      rethrow;
     }
   }
 }
