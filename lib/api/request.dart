@@ -5,6 +5,7 @@ import "package:cookie_jar/cookie_jar.dart";
 import "package:dio_cookie_manager/dio_cookie_manager.dart";
 import 'package:flutter/material.dart';
 import 'package:goods_hunter/private.dart';
+import 'package:goods_hunter/utils/popup.dart';
 import 'package:path_provider/path_provider.dart';
 import "../models/index.dart" as Model;
 
@@ -57,8 +58,7 @@ class Request {
       if (context is BuildContext) {
         final errorMsg = "请求失败, 错误信息:${e.message}";
         try {
-          final scaffoldMessengerState = ScaffoldMessenger.of(context);
-          scaffoldMessengerState.showSnackBar(SnackBar(content: Text(errorMsg)));
+          showMessage(context: context, title: errorMsg, callback: (){});
         } catch (e) {
           showDialog(context: context, builder: (context) {
             return AlertDialog(

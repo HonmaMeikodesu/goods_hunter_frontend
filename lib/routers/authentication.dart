@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:goods_hunter/api/index.dart';
+import 'package:goods_hunter/utils/popup.dart';
 
 
 class AuthenticationRoute extends StatefulWidget {
@@ -8,29 +9,6 @@ class AuthenticationRoute extends StatefulWidget {
 
   @override
   _AuthenticationRouterState createState() => _AuthenticationRouterState();
-}
-
-void _showLoading(BuildContext context, String title) {
-  showDialog(context: context, barrierDismissible: false, builder: (context) {
-    return AlertDialog(
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const CircularProgressIndicator(),
-          Padding(
-            padding: const EdgeInsets.only(top: 26.0),
-            child: Text(title),
-          )
-        ],
-      ),
-    );
-  });
-}
-
-void _showSuccess({required BuildContext context,required String title, required void callback()}) {
-  ScaffoldMessenger.of(context)
-    .showSnackBar(SnackBar(content: Text(title)))
-      .closed.then((value) => callback());
 }
 
 class _AuthenticationRouterState extends State<AuthenticationRoute> {
@@ -49,16 +27,11 @@ class _AuthenticationRouterState extends State<AuthenticationRoute> {
                 ],
               )
           ),
-          body: const Padding(
-            padding: EdgeInsets.all(16),
-            child: (
-              TabBarView(
-                  children: <Widget>[
-                    LoginRouter(),
-                    RegisterRouter(),
-                  ]
-              )
-            ),
+          body: const TabBarView(
+              children: <Widget>[
+                Padding(padding: EdgeInsets.all(16), child: LoginRouter()),
+                Padding(padding: EdgeInsets.all(16), child: RegisterRouter()),
+              ]
           ),
         ),
     );
@@ -71,11 +44,16 @@ class _LoginRouterState extends State<LoginRouter> {
   String password = "";
 
   void onLoginSubmitted(BuildContext context) async {
-    _showLoading(context, "登录中");
     if(Form.of(context)!.validate()) {
       try {
+        showLoading(context, "登录中");
         await loginApi(email: email, password: password, context: context).then((_) {
-          _showSuccess(context: context, title: "登录成功", callback:  (){ Navigator.pop(context); });
+          showMessage(
+              context: context,
+              title: "登录成功",
+              callback: (){
+                Navigator.pop(context);
+              });
         });
       } finally {
         Navigator.of(context).pop();
@@ -85,44 +63,44 @@ class _LoginRouterState extends State<LoginRouter> {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Form(
-        child: Column(
-          children: [
-            TextFormField(
-              autofocus: true,
-              keyboardType: TextInputType.emailAddress,
-              textInputAction: TextInputAction.next,
-              decoration: const InputDecoration(
-                icon: Icon(Icons.email, color: Colors.blue),
-                labelText: "邮箱",
-                hintText: "请输入邮箱地址",
-              ),
-              autovalidateMode: AutovalidateMode.onUserInteraction,
-              validator: (v) {
-                return (v != null && EmailValidator.validate(v.trim())) ? null : "邮箱地址不合法";
-              },
-              onChanged: (v) {
-                setState(() {
-                  email = v.trim();
-                });
-              },
+    return Form(
+      child: Column(
+        children: [
+          TextFormField(
+            autofocus: true,
+            keyboardType: TextInputType.emailAddress,
+            textInputAction: TextInputAction.next,
+            decoration: const InputDecoration(
+              icon: Icon(Icons.email, color: Colors.blue),
+              labelText: "邮箱",
+              hintText: "请输入邮箱地址",
             ),
-            TextFormField(
+            autovalidateMode: AutovalidateMode.onUserInteraction,
+            validator: (v) {
+              return (v != null && EmailValidator.validate(v.trim())) ? null : "邮箱地址不合法";
+            },
+            onChanged: (v) {
+              setState(() {
+                email = v.trim();
+              });
+            },
+          ),
+          Builder(builder: (context) {
+            return TextFormField(
               keyboardType: TextInputType.visiblePassword,
-              textInputAction: TextInputAction.next,
+              textInputAction: TextInputAction.send,
               decoration: const InputDecoration(
                   icon: Icon(Icons.password, color: Colors.blue),
                   labelText: "密码",
                   hintText: "请输入密码"
               ),
               autovalidateMode: AutovalidateMode.onUserInteraction,
-              onFieldSubmitted: (value) {
-                print(value);
-              },
               validator: (v) {
                 var reg = RegExp(r"^\w{6,}$");
                 return (v != null && reg.hasMatch(v)) ? null : "密码不合法";
+              },
+              onFieldSubmitted: (password) {
+                onLoginSubmitted(context);
               },
               obscureText: true,
               onChanged: (v) {
@@ -130,23 +108,19 @@ class _LoginRouterState extends State<LoginRouter> {
                   password = v;
                 });
               },
-            ),
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: Row(
-                children: [
-                  Builder(builder: (context) {
-                    return ElevatedButton(onPressed: (){
-                      if(Form.of(context)!.validate()) {
-                        onLoginSubmitted(context);
-                      }
-                    }, child: const Text("登录"));
-                  })
-                ],
-              ),
-            )
-          ],
-        ),
+            );
+          }),
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Builder(builder: (context) {
+              return ElevatedButton(onPressed: (){
+                if(Form.of(context)!.validate()) {
+                  onLoginSubmitted(context);
+                }
+              }, child: const Text("登录"));
+            }),
+          )
+        ],
       ),
     );
   }
@@ -166,10 +140,10 @@ class _RegisterRouterState extends State<RegisterRouter> {
 
   void onRegisterSubmitted(BuildContext context) async {
     if(Form.of(context)!.validate()) {
-      _showLoading(context, "注册中");
+      showLoading(context, "注册中");
       try {
         await registerApi(email: email, password: password, context: context).then((_) {
-          _showSuccess(context: context, title: "注册成功", callback:  (){
+          showMessage(context: context, title: "注册成功", callback:  (){
             DefaultTabController.of(context)?.index = 0;
           });
         });
@@ -181,51 +155,50 @@ class _RegisterRouterState extends State<RegisterRouter> {
 
   @override
   Widget build(BuildContext context) {
-
-    return Center(
-      child: Form(
-        child: Column(
-          children: [
-            TextFormField(
-              autofocus: true,
-              keyboardType: TextInputType.emailAddress,
-              textInputAction: TextInputAction.next,
-              decoration: const InputDecoration(
-                icon: Icon(Icons.email),
-                labelText: "邮箱",
-                hintText: "请输入你的常用邮箱",
-              ),
-              autovalidateMode: AutovalidateMode.onUserInteraction,
-              validator: (v) {
-                return (v != null &&  EmailValidator.validate(v.trim())) ? null : "邮箱地址不合法,请重新输入";
-              },
-              onChanged: (v) {
-                setState(() {
-                  email = v.trim();
-                });
-              },
+    return Form(
+      child: Column(
+        children: [
+          TextFormField(
+            autofocus: true,
+            keyboardType: TextInputType.emailAddress,
+            textInputAction: TextInputAction.next,
+            decoration: const InputDecoration(
+              icon: Icon(Icons.email),
+              labelText: "邮箱",
+              hintText: "请输入你的常用邮箱",
             ),
-            TextFormField(
-              keyboardType: TextInputType.visiblePassword,
-              textInputAction: TextInputAction.next,
-              decoration: const InputDecoration(
-                  icon: Icon(Icons.password),
-                  labelText: "密码",
-                  hintText: "请输入你的密码,密码长度应是大于等于6的中英文字符"
-              ),
-              autovalidateMode: AutovalidateMode.onUserInteraction,
-              validator: (v) {
-                var reg = RegExp(r"^\w{6,}$");
-                return (v != null && reg.hasMatch(v)) ? null : "密码不合法,请重新输入";
-              },
-              obscureText: true,
-              onChanged: (v) {
-                setState(() {
-                  password = v;
-                });
-              },
+            autovalidateMode: AutovalidateMode.onUserInteraction,
+            validator: (v) {
+              return (v != null &&  EmailValidator.validate(v.trim())) ? null : "邮箱地址不合法,请重新输入";
+            },
+            onChanged: (v) {
+              setState(() {
+                email = v.trim();
+              });
+            },
+          ),
+          TextFormField(
+            keyboardType: TextInputType.visiblePassword,
+            textInputAction: TextInputAction.next,
+            decoration: const InputDecoration(
+                icon: Icon(Icons.password),
+                labelText: "密码",
+                hintText: "请输入你的密码,密码长度应是大于等于6的中英文字符"
             ),
-            TextFormField(
+            autovalidateMode: AutovalidateMode.onUserInteraction,
+            validator: (v) {
+              var reg = RegExp(r"^\w{6,}$");
+              return (v != null && reg.hasMatch(v)) ? null : "密码不合法,请重新输入";
+            },
+            obscureText: true,
+            onChanged: (v) {
+              setState(() {
+                password = v;
+              });
+            },
+          ),
+          Builder(builder: (context) {
+            return TextFormField(
               keyboardType: TextInputType.visiblePassword,
               textInputAction: TextInputAction.send,
               decoration: const InputDecoration(
@@ -238,24 +211,22 @@ class _RegisterRouterState extends State<RegisterRouter> {
               validator: (v) {
                 return (v == password) ? null : "两次密码输入不一致,请重新输入";
               },
-            ),
-            Padding(
-              padding: EdgeInsets.all(16),
-              child: Row(
-                children: [
-                  Builder(builder: (context) {
-                    return ElevatedButton(onPressed: (){
-                      if(Form.of(context)!.validate()) {
-                        onRegisterSubmitted(context);
-                      }
-                    }, child: const Text("注册"));
-                  })
-
-                ],
-              ),
-            )
-          ],
-        ),
+              onFieldSubmitted: (password) {
+                onRegisterSubmitted(context);
+              },
+            );
+          }),
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Builder(builder: (context) {
+              return ElevatedButton(onPressed: (){
+                if(Form.of(context)!.validate()) {
+                  onRegisterSubmitted(context);
+                }
+              }, child: const Text("注册"));
+            }),
+          )
+        ],
       ),
     );
   }

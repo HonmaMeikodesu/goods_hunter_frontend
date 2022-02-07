@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:goods_hunter/utils/loginState.dart';
 import './routers/authentication.dart';
 
 void main() {
@@ -64,6 +65,13 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    checkLoginStateExist().then((value) {
+      if(!value) {
+        Navigator.push(context, MaterialPageRoute(builder: (context) {
+          return AuthenticationRoute();
+        }));
+      }
+    });
     // This method is rerun every time setState is called, for instance as done
     // by the _incrementCounter method above.
     //
