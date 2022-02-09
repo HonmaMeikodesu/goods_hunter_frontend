@@ -8,7 +8,6 @@ Future<bool> checkLoginStateExist() async {
   var path = dir.path;
   var cookieJar=PersistCookieJar(storage: FileStorage(path));
   return cookieJar.loadForRequest(Uri(host: serverIp)).then((value) {
-    var loginState = value.where((cookie) => cookie.name == "loginState").first;
-    return loginState is Cookie;
+    return value.where((cookie) => cookie.name == "loginState").isNotEmpty;
   });
 }

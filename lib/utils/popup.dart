@@ -19,6 +19,6 @@ void showLoading(BuildContext context, String title) {
 
 void showMessage({required BuildContext context,required String title, required void callback()}) {
   ScaffoldMessenger.of(context)
-      .showSnackBar(SnackBar(content: Text(title)))
+      .showSnackBar(SnackBar(content: Text(title), duration: const Duration(milliseconds: 1500),))
       .closed.then((value) => callback());
 }
