@@ -9,14 +9,6 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -27,26 +19,17 @@ class _HomePageState extends State<HomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headline4,
-            ),
             ElevatedButton(onPressed: (){
               Navigator.pushNamed (context, "authentication");
             }, child: Text("123")),
             ElevatedButton(onPressed: (){
               Navigator.pushNamed (context, "my");
-            }, child: Text("456"))
+            }, child: Text("456")),
+            ElevatedButton(onPressed: (){
+              Navigator.pushNamed (context, "hunterPub");
+            }, child: Text("789"))
           ],
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
       ),
     );
   }
