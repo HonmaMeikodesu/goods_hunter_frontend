@@ -58,9 +58,37 @@ class _HunterPubRouteState extends State {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () { Navigator.of(context).maybePop();},
+          padding: const EdgeInsets.all(16),
+        ),
+        title: const PubHeader(),
+        actions: [
+          Stack(
+            children: [
+              IconButton(
+                  onPressed: () {
+                    Overlay.of(context)?.insert(OverlayEntry(builder: (context) {
+                      return Positioned(
+                        top: 92,
+                        child: Column(
+                          children: [
+                            Text("1234")
+                          ],
+                        ),
+                      );
+                    }));
+                  },
+                  icon: const Icon(Icons.arrow_downward)
+              )
+            ],
+          )
+        ],
+      ),
       body: Column(
         children: const [
-          PubHeader(),
         ],
       ),
       floatingActionButton: FloatingActionButton(
