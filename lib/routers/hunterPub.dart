@@ -74,7 +74,6 @@ class _PubHeaderState extends State {
         });},
     ));
     return SizedBox(
-      height: 48,
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         child: Flex(
@@ -107,7 +106,7 @@ class _HunterPubRouteState extends State {
                       top: topContext.findAncestorWidgetOfExactType<AppBar>()?.preferredSize.height,
                       child: Row(
                         children: [
-
+                          Text("123")
                         ],
                       ),
                     );
