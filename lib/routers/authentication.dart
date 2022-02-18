@@ -17,21 +17,23 @@ class _AuthenticationRouterState extends State<AuthenticationRoute> {
   Widget build(BuildContext context) {
     return DefaultTabController(
         length: 2,
-        child: Scaffold(
-          appBar: AppBar(
-              title: const Text("Welcome to goods hunter!"),
-              bottom: const TabBar(
-                tabs: <Widget>[
-                  Tab(text: "登录"),
-                  Tab(text: "注册")
-                ],
-              )
-          ),
-          body: const TabBarView(
-              children: <Widget>[
-                Padding(padding: EdgeInsets.all(16), child: LoginRouter()),
-                Padding(padding: EdgeInsets.all(16), child: RegisterRouter()),
-              ]
+        child: SafeArea(
+          child: Scaffold(
+            appBar: AppBar(
+                title: const Text("Welcome to goods hunter!"),
+                bottom: const TabBar(
+                  tabs: <Widget>[
+                    Tab(text: "登录"),
+                    Tab(text: "注册")
+                  ],
+                )
+            ),
+            body: const TabBarView(
+                children: <Widget>[
+                  Padding(padding: EdgeInsets.all(16), child: LoginRouter()),
+                  Padding(padding: EdgeInsets.all(16), child: RegisterRouter()),
+                ]
+            ),
           ),
         ),
     );

@@ -5,10 +5,10 @@ class MyPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return SafeArea(child: Scaffold(
       appBar: AppBar(
         title: Text("My"),
       ),
-    );
+    ));
   }
 }

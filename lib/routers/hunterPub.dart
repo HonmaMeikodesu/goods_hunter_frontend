@@ -89,43 +89,51 @@ class _HunterPubRouteState extends State {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () { Navigator.of(context).maybePop();},
-          padding: const EdgeInsets.all(16),
-        ),
-        title: const PubHeader(),
-        actions: [
-          Builder(builder: (topContext) {
-            return IconButton(
-                onPressed: () {
-                  Overlay.of(context)?.insert(OverlayEntry(builder: (context) {
-                    return Positioned(
-                      top: topContext.findAncestorWidgetOfExactType<AppBar>()?.preferredSize.height,
-                      child: Row(
-                        children: [
-                          Text("123")
-                        ],
-                      ),
-                    );
-                  }));
-                },
-                icon: const Icon(Icons.arrow_downward)
-            );
-          })
-        ],
-      ),
-      body: Column(
-        children: const [
-        ],
-      ),
-      floatingActionButton: FloatingActionButton(
-        tooltip: 'todo',
-        onPressed: () {},
-        child: const Icon(Icons.add),
-      ),
+    return SafeArea(
+        child: Overlay(
+          initialEntries: [
+            OverlayEntry(builder: (context){
+              return Scaffold(
+                appBar: AppBar(
+                  leading: IconButton(
+                    icon: const Icon(Icons.arrow_back),
+                    onPressed: () { Navigator.of(context).maybePop();},
+                    padding: const EdgeInsets.all(16),
+                  ),
+                  title: const PubHeader(),
+                  actions: [
+                    Builder(builder: (topContext) {
+                      return IconButton(
+                          onPressed: () {
+                            Overlay.of(context)?.insert(OverlayEntry(builder: (context) {
+                              return Positioned(
+                                top: topContext.findAncestorWidgetOfExactType<AppBar>()?.preferredSize.height,
+                                child: Row(
+                                  children: [
+                                    Text("123")
+                                  ],
+                                ),
+                              );
+                            }));
+                          },
+                          icon: const Icon(Icons.arrow_downward)
+                      );
+                    })
+                  ],
+                ),
+                body: Column(
+                  children: const [
+                  ],
+                ),
+                floatingActionButton: FloatingActionButton(
+                  tooltip: 'todo',
+                  onPressed: () {},
+                  child: const Icon(Icons.add),
+                ),
+              );
+            })
+          ],
+        )
     );
   }
 }
