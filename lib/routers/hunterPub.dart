@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class HunterPubRoute extends StatefulWidget {
-  const HunterPubRoute({Key? key}): super(key: key);
+  const HunterPubRoute({Key? key}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() => _HunterPubRouteState();
@@ -17,7 +17,9 @@ Map<String, String> hunterRoundTables = {
 class PubTab extends StatelessWidget {
   final String imageUrl;
   final String content;
-  const PubTab({Key? key, required this.imageUrl, required this.content }): super(key: key);
+
+  const PubTab({Key? key, required this.imageUrl, required this.content})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +28,9 @@ class PubTab extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.center,
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        ConstrainedBox(constraints: BoxConstraints(), child: Image.asset(imageUrl)),
+        ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 54),
+            child: Image.asset(imageUrl)),
         Text(
           content,
         )
@@ -36,72 +40,87 @@ class PubTab extends StatelessWidget {
 }
 
 List<Tab> buildTabs(BuildContext context) {
-  return hunterRoundTables.keys.map((key) => Tab(
-    height: context.findAncestorWidgetOfExactType<AppBar>()!.preferredSize.height - 2.0,
-    child: PubTab(imageUrl: "assets/images/$key.png", content: hunterRoundTables[key]!),
-  )).toList();
+  return hunterRoundTables.keys
+      .map((key) => Tab(
+            height: context
+                    .findAncestorWidgetOfExactType<AppBar>()!
+                    .preferredSize
+                    .height -
+                2.0,
+            child: PubTab(
+                imageUrl: "assets/images/$key.png",
+                content: hunterRoundTables[key]!),
+          ))
+      .toList();
 }
 
 class _HunterPubRouteState extends State {
-
   @override
   Widget build(BuildContext context) {
     return SafeArea(
         child: Overlay(
-          initialEntries: [
-            OverlayEntry(builder: (context){
-              return DefaultTabController(
-                  length: 4,
-                  child: Scaffold(
-                    appBar: AppBar(
-                      leading: IconButton(
-                        icon: const Icon(Icons.arrow_back),
-                        onPressed: () { Navigator.of(context).maybePop();},
-                        padding: const EdgeInsets.all(16),
-                      ),
-                      title: Builder(builder: (context) {
-                        return TabBar(
-                          isScrollable: true,
-                          tabs: buildTabs(context),
-                          labelStyle: const TextStyle(fontWeight: FontWeight.bold),
-                          unselectedLabelStyle: const TextStyle(color: Color.fromRGBO(203, 203, 207, 0.5)),
-                        );
-                      }),
-                      actions: [
-                        Builder(builder: (topContext) {
-                          return IconButton(
-                              onPressed: () {
-                                Overlay.of(context)?.insert(OverlayEntry(builder: (context) {
-                                  return Positioned(
-                                    top: topContext.findAncestorWidgetOfExactType<AppBar>()?.preferredSize.height,
+      initialEntries: [
+        OverlayEntry(builder: (context) {
+          return DefaultTabController(
+              length: 4,
+              child: Scaffold(
+                appBar: AppBar(
+                  leading: IconButton(
+                    icon: const Icon(Icons.arrow_back),
+                    onPressed: () {
+                      Navigator.of(context).maybePop();
+                    },
+                    padding: const EdgeInsets.all(16),
+                  ),
+                  title: Builder(builder: (context) {
+                    return TabBar(
+                      isScrollable: true,
+                      tabs: buildTabs(context),
+                      labelStyle: const TextStyle(fontWeight: FontWeight.bold),
+                      unselectedLabelStyle: const TextStyle(
+                          color: Color.fromRGBO(203, 203, 207, 0.5)),
+                    );
+                  }),
+                  actions: [
+                    Builder(builder: (topContext) {
+                      return IconButton(
+                          onPressed: () {
+                            Overlay.of(context)
+                                ?.insert(OverlayEntry(builder: (context) {
+                              return Stack(
+                                children: [
+                                  Positioned(
+                                    top: topContext
+                                        .findAncestorWidgetOfExactType<
+                                        AppBar>()
+                                        ?.preferredSize
+                                        .height,
                                     child: Row(
-                                      children: [
-                                        Text("123")
-                                      ],
+                                      children: [Text("123")],
                                     ),
-                                  );
-                                }));
-                              },
-                              icon: const Icon(Icons.arrow_downward)
-                          );
-                        })
-                      ],
-                    ),
-                    body: TabBarView(children: [
-                      Text("123"),
-                      Text("123"),
-                      Text("123"),
-                      Text("123"),
-                    ]),
-                    floatingActionButton: FloatingActionButton(
-                      tooltip: 'todo',
-                      onPressed: () {},
-                      child: const Icon(Icons.add),
-                    ),
-                  ));
-            })
-          ],
-        )
-    );
+                                  )
+                                ],
+                              );
+                            }));
+                          },
+                          icon: const Icon(Icons.arrow_downward));
+                    })
+                  ],
+                ),
+                body: TabBarView(children: [
+                  Text("123"),
+                  Text("123"),
+                  Text("123"),
+                  Text("123"),
+                ]),
+                floatingActionButton: FloatingActionButton(
+                  tooltip: 'todo',
+                  onPressed: () {},
+                  child: const Icon(Icons.add),
+                ),
+              ));
+        })
+      ],
+    ));
   }
 }
