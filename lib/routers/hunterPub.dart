@@ -85,19 +85,26 @@ class _HunterPubRouteState extends State {
                     Builder(builder: (topContext) {
                       return IconButton(
                           onPressed: () {
+                            final size = MediaQuery.of(topContext).size;
+                            final bannerHeight = topContext
+                                .findAncestorWidgetOfExactType<
+                                AppBar>()
+                                ?.preferredSize
+                                .height;
                             Overlay.of(context)
                                 ?.insert(OverlayEntry(builder: (context) {
                               return Stack(
                                 children: [
                                   Positioned(
-                                    top: topContext
-                                        .findAncestorWidgetOfExactType<
-                                        AppBar>()
-                                        ?.preferredSize
-                                        .height,
-                                    child: Row(
-                                      children: [Text("123")],
-                                    ),
+                                    top: bannerHeight,
+                                    child: Container(
+                                      width: size.width,
+                                      height: size.height - bannerHeight!,
+                                      decoration: BoxDecoration(color: Color.fromRGBO(200, 200, 200, 0.5)),
+                                      child:
+                                        Text("1234")
+                                      ,
+                                    )
                                   )
                                 ],
                               );
