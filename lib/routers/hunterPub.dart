@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:math' as math;
 
 class HunterPubRoute extends StatefulWidget {
   const HunterPubRoute({Key? key}) : super(key: key);
@@ -54,7 +55,24 @@ List<Tab> buildTabs(BuildContext context) {
       .toList();
 }
 
-class _HunterPubRouteState extends State {
+class _HunterPubRouteState extends State with TickerProviderStateMixin {
+
+  double bannerHeight = 0;
+
+  bool expanded = false;
+
+  Animation<double>? arrowAnimation;
+  Animation<double>? overlayAnimation;
+  late AnimationController animationController;
+
+  @override
+  void initState() {
+    animationController = AnimationController(
+        duration: const Duration(milliseconds: 200),
+        vsync: this
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -82,39 +100,43 @@ class _HunterPubRouteState extends State {
                     );
                   }),
                   actions: [
-                    Builder(builder: (topContext) {
+                    Builder(builder: (context) {
                       return IconButton(
-                          onPressed: () {
-                            final size = MediaQuery.of(topContext).size;
-                            final bannerHeight = topContext
-                                .findAncestorWidgetOfExactType<
-                                AppBar>()
-                                ?.preferredSize
-                                .height;
-                            Overlay.of(context)
-                                ?.insert(OverlayEntry(builder: (context) {
-                              return Stack(
-                                children: [
-                                  Positioned(
-                                    top: bannerHeight,
-                                    child: Container(
-                                      width: size.width,
-                                      height: size.height - bannerHeight!,
-                                      decoration: BoxDecoration(color: Color.fromRGBO(200, 200, 200, 0.5)),
-                                      child:
-                                        Text("1234")
-                                      ,
-                                    )
-                                  )
-                                ],
-                              );
-                            }));
-                          },
-                          icon: const Icon(Icons.arrow_downward));
+                          onPressed: () {},
+                          icon: GestureDetector(
+                            child: Container(
+                                alignment: Alignment.center,
+                                child: Transform.rotate(
+                                  angle: arrowAnimation is Animation ? arrowAnimation!.value : 0,
+                                  child: const Icon(Icons.arrow_downward),
+                                )
+                            ),
+                            onTap: () {
+                              setState(() {
+                                final size = MediaQuery.of(context).size;
+                                final _bannerHeight = context
+                                    !.findAncestorWidgetOfExactType<
+                                    AppBar>()
+                                    !.preferredSize
+                                    .height;
+                                bannerHeight = _bannerHeight;
+                                expanded = !expanded;
+                                arrowAnimation = Tween(begin: 0.0, end: math.pi).animate(animationController)..addListener(() {setState(() {
+                                });});
+                                overlayAnimation = Tween(begin: 0.0, end: size.height-(bannerHeight ?? 0)).animate(animationController)..addListener(() {setState(() {
+                                });});
+                                if (!expanded) {
+                                  animationController.forward();
+                                } else {
+                                  animationController.reverse();
+                                }
+                              });
+                            },
+                          ));
                     })
                   ],
                 ),
-                body: TabBarView(children: [
+                body: const TabBarView(children: [
                   Text("123"),
                   Text("123"),
                   Text("123"),
@@ -126,6 +148,18 @@ class _HunterPubRouteState extends State {
                   child: const Icon(Icons.add),
                 ),
               ));
+        }),
+        OverlayEntry(builder: (context) {
+          return Positioned(
+            width: MediaQuery.of(context).size.width,
+            height: overlayAnimation is Animation ? overlayAnimation!.value : 0,
+            top: bannerHeight,
+            child: Container(
+              decoration: const BoxDecoration(color: Color.fromRGBO(225, 225, 225, 0.5)),
+              child: Text("hahahaha")
+              ,
+            )
+          );
         })
       ],
     ));
