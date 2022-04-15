@@ -162,21 +162,22 @@ class _HunterPubRouteState extends State with TickerProviderStateMixin {
             height: overlayAnimation is Animation ? overlayAnimation!.value : 0,
             top: bannerHeight,
             child: Container(
-              decoration: const BoxDecoration(color: Color.fromRGBO(225, 225, 225, 0.5)),
-              child: Flex(
-                direction: Axis.horizontal,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: hunterRoundTables.keys.map((hunterKey) => PubBadge(
-                    active: currentSelectedTab == hunterKey,
-                    title: hunterRoundTables[hunterKey]!,
-                    setTitle: () {
-                      setState(() {
-                        currentSelectedTab=hunterKey;
-                      });
-                    }
-                )).toList(),
-              )
-              ,
+              decoration: const BoxDecoration(color: Color.fromRGBO(50, 50, 50, 0.5)),
+              constraints: BoxConstraints(maxHeight: 20.0, maxWidth: 20.0),
+              child: Container(
+                decoration: const BoxDecoration(color: Colors.white),
+                child: Row(
+                  children: hunterRoundTables.keys.map((hunterKey) => PubBadge(
+                      active: currentSelectedTab == hunterKey,
+                      title: hunterRoundTables[hunterKey]!,
+                      setTitle: () {
+                        setState(() {
+                          currentSelectedTab=hunterKey;
+                        });
+                      }
+                  )).toList(),
+                ),
+              ),
             )
           );
         })
@@ -193,14 +194,20 @@ class PubBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return OutlinedButton(
-      style: active ? ButtonStyle(
-        textStyle: MaterialStateProperty.all(const TextStyle(color: Colors.blue)),
-        shape: MaterialStateProperty.all(const BeveledRectangleBorder(side: BorderSide(color: Colors.blue))),
-      ) : const ButtonStyle(),
-      onPressed: () {
-        setTitle();
-      },
-      child: Text(title));
+    return Container(
+      child: OutlinedButton(
+          style: active ? ButtonStyle(
+            backgroundColor: MaterialStateProperty.all(Colors.blue),
+            foregroundColor: MaterialStateProperty.all(Colors.white),
+          ) : ButtonStyle(
+            backgroundColor: MaterialStateProperty.all(Colors.white),
+          ),
+          onPressed: () {
+            setTitle();
+          },
+          child: Text(title)
+      ),
+      padding: EdgeInsets.all(5.0),
+    );
   }
 }
