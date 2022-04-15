@@ -18,41 +18,31 @@ Map<String, String> hunterRoundTables = {
 class PubTab extends StatelessWidget {
   final String imageUrl;
   final String content;
+  final void Function() onClick;
 
-  const PubTab({Key? key, required this.imageUrl, required this.content})
+  const PubTab({Key? key, required this.imageUrl, required this.content, required this.onClick})
       : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Flex(
-      direction: Axis.horizontal,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 54),
-            child: Image.asset(imageUrl)),
-        Text(
-          content,
-        )
-      ],
+    return GestureDetector(
+      onTap: onClick,
+      child: Flex(
+        direction: Axis.horizontal,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 54),
+              child: Image.asset(imageUrl)
+          ),
+          Text(
+            content,
+          )
+        ],
+      ),
     );
   }
-}
-
-List<Tab> buildTabs(BuildContext context) {
-  return hunterRoundTables.keys
-      .map((key) => Tab(
-            height: context
-                    .findAncestorWidgetOfExactType<AppBar>()!
-                    .preferredSize
-                    .height -
-                2.0,
-            child: PubTab(
-                imageUrl: "assets/images/$key.png",
-                content: hunterRoundTables[key]!),
-          ))
-      .toList();
 }
 
 class _HunterPubRouteState extends State with TickerProviderStateMixin {
@@ -60,6 +50,7 @@ class _HunterPubRouteState extends State with TickerProviderStateMixin {
   double bannerHeight = 0;
 
   bool expanded = false;
+  String currentSelectedTab = "mercari";
 
   Animation<double>? arrowAnimation;
   Animation<double>? overlayAnimation;
@@ -93,7 +84,23 @@ class _HunterPubRouteState extends State with TickerProviderStateMixin {
                   title: Builder(builder: (context) {
                     return TabBar(
                       isScrollable: true,
-                      tabs: buildTabs(context),
+                      tabs: hunterRoundTables.keys
+                          .map((key) => Tab(
+                            height: context
+                                .findAncestorWidgetOfExactType<AppBar>()!
+                                .preferredSize
+                                .height -
+                                2.0,
+                            child: PubTab(
+                                onClick: () {
+                                  setState(() {
+                                    currentSelectedTab = key;
+                                  });
+                                },
+                                imageUrl: "assets/images/$key.png",
+                                content: hunterRoundTables[key]!),
+                          ))
+                              .toList(),
                       labelStyle: const TextStyle(fontWeight: FontWeight.bold),
                       unselectedLabelStyle: const TextStyle(
                           color: Color.fromRGBO(203, 203, 207, 0.5)),
@@ -156,12 +163,44 @@ class _HunterPubRouteState extends State with TickerProviderStateMixin {
             top: bannerHeight,
             child: Container(
               decoration: const BoxDecoration(color: Color.fromRGBO(225, 225, 225, 0.5)),
-              child: Text("hahahaha")
+              child: Flex(
+                direction: Axis.horizontal,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: hunterRoundTables.keys.map((hunterKey) => PubBadge(
+                    active: currentSelectedTab == hunterKey,
+                    title: hunterRoundTables[hunterKey]!,
+                    setTitle: () {
+                      setState(() {
+                        currentSelectedTab=hunterKey;
+                      });
+                    }
+                )).toList(),
+              )
               ,
             )
           );
         })
       ],
     ));
+  }
+}
+
+class PubBadge extends StatelessWidget {
+  final bool active;
+  final String title;
+  final void Function() setTitle;
+  const PubBadge({required this.active, required this.title, required this.setTitle, Key? key,}): super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return OutlinedButton(
+      style: active ? ButtonStyle(
+        textStyle: MaterialStateProperty.all(const TextStyle(color: Colors.blue)),
+        shape: MaterialStateProperty.all(const BeveledRectangleBorder(side: BorderSide(color: Colors.blue))),
+      ) : const ButtonStyle(),
+      onPressed: () {
+        setTitle();
+      },
+      child: Text(title));
   }
 }
