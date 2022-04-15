@@ -82,6 +82,7 @@ class _HunterPubRouteState extends State with TickerProviderStateMixin {
                     padding: const EdgeInsets.all(16),
                   ),
                   title: Builder(builder: (context) {
+                    DefaultTabController.of(context)?.index = hunterRoundTables.keys.toList().indexOf(currentSelectedTab);
                     return TabBar(
                       isScrollable: true,
                       tabs: hunterRoundTables.keys
@@ -158,25 +159,24 @@ class _HunterPubRouteState extends State with TickerProviderStateMixin {
         }),
         OverlayEntry(builder: (context) {
           return Positioned(
-            width: MediaQuery.of(context).size.width,
-            height: overlayAnimation is Animation ? overlayAnimation!.value : 0,
             top: bannerHeight,
+              width: MediaQuery.of(context).size.width,
+              height: overlayAnimation is Animation ? overlayAnimation!.value : 0,
             child: Container(
-              decoration: const BoxDecoration(color: Color.fromRGBO(50, 50, 50, 0.5)),
-              constraints: BoxConstraints(maxHeight: 20.0, maxWidth: 20.0),
-              child: Container(
-                decoration: const BoxDecoration(color: Colors.white),
-                child: Row(
-                  children: hunterRoundTables.keys.map((hunterKey) => PubBadge(
-                      active: currentSelectedTab == hunterKey,
-                      title: hunterRoundTables[hunterKey]!,
-                      setTitle: () {
-                        setState(() {
-                          currentSelectedTab=hunterKey;
-                        });
-                      }
-                  )).toList(),
-                ),
+              decoration: BoxDecoration(color: Color.fromRGBO(50, 50, 50, 0.5)),
+              width: MediaQuery.of(context).size.width,
+              height: overlayAnimation is Animation ? overlayAnimation!.value : 0,
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: hunterRoundTables.keys.map((hunterKey) => PubBadge(
+                    active: currentSelectedTab == hunterKey,
+                    title: hunterRoundTables[hunterKey]!,
+                    setTitle: () {
+                      setState(() {
+                        currentSelectedTab=hunterKey;
+                      });
+                    }
+                )).toList(),
               ),
             )
           );
