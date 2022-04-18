@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
 
@@ -55,13 +57,15 @@ class _HunterPubRouteState extends State with TickerProviderStateMixin {
   Animation<double>? arrowAnimation;
   Animation<double>? overlayAnimation;
   late AnimationController animationController;
+  late CurvedAnimation curvedAnimation;
 
   @override
   void initState() {
     animationController = AnimationController(
-        duration: const Duration(milliseconds: 200),
-        vsync: this
+        duration: const Duration(milliseconds: 500),
+        vsync: this,
     );
+    curvedAnimation = CurvedAnimation(parent: animationController, curve: Curves.easeOut);
   }
 
   @override
@@ -110,36 +114,34 @@ class _HunterPubRouteState extends State with TickerProviderStateMixin {
                   actions: [
                     Builder(builder: (context) {
                       return IconButton(
-                          onPressed: () {},
-                          icon: GestureDetector(
-                            child: Container(
-                                alignment: Alignment.center,
-                                child: Transform.rotate(
-                                  angle: arrowAnimation is Animation ? arrowAnimation!.value : 0,
-                                  child: const Icon(Icons.arrow_downward),
-                                )
-                            ),
-                            onTap: () {
-                              setState(() {
-                                final size = MediaQuery.of(context).size;
-                                final _bannerHeight = context
-                                    !.findAncestorWidgetOfExactType<
-                                    AppBar>()
-                                    !.preferredSize
-                                    .height;
-                                bannerHeight = _bannerHeight;
-                                expanded = !expanded;
-                                arrowAnimation = Tween(begin: 0.0, end: math.pi).animate(animationController)..addListener(() {setState(() {
-                                });});
-                                overlayAnimation = Tween(begin: 0.0, end: size.height-(bannerHeight ?? 0)).animate(animationController)..addListener(() {setState(() {
-                                });});
-                                if (!expanded) {
-                                  animationController.forward();
-                                } else {
-                                  animationController.reverse();
-                                }
-                              });
-                            },
+                          onPressed: () {
+                            setState(() {
+                              final size = MediaQuery.of(context).size;
+                              final _bannerHeight = context
+                              !.findAncestorWidgetOfExactType<
+                                  AppBar>()
+                              !.preferredSize
+                                  .height;
+                              bannerHeight = _bannerHeight;
+                              bool nextExpanded = !expanded;
+                              arrowAnimation = Tween(begin: 0.0, end: math.pi).animate(curvedAnimation)..addListener(() {setState(() {
+                              });});
+                              overlayAnimation = Tween(begin: 0.0, end: size.height-(bannerHeight ?? 0)).animate(curvedAnimation)..addListener(() {setState(() {
+                              });});
+                              if (!expanded) {
+                                animationController.forward();
+                              } else {
+                                animationController.reverse();
+                              }
+                              expanded = nextExpanded;
+                            });
+                          },
+                          icon: Container(
+                              alignment: Alignment.center,
+                              child: Transform.rotate(
+                                angle: arrowAnimation is Animation ? arrowAnimation!.value : 0,
+                                child: const Icon(Icons.arrow_downward),
+                              )
                           ));
                     })
                   ],
