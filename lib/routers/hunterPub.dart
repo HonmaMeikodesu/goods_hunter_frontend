@@ -163,20 +163,26 @@ class _HunterPubRouteState extends State with TickerProviderStateMixin {
               width: MediaQuery.of(context).size.width,
               height: overlayAnimation is Animation ? overlayAnimation!.value : 0,
             child: Container(
-              decoration: BoxDecoration(color: Color.fromRGBO(50, 50, 50, 0.5)),
-              width: MediaQuery.of(context).size.width,
-              height: overlayAnimation is Animation ? overlayAnimation!.value : 0,
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: hunterRoundTables.keys.map((hunterKey) => PubBadge(
-                    active: currentSelectedTab == hunterKey,
-                    title: hunterRoundTables[hunterKey]!,
-                    setTitle: () {
-                      setState(() {
-                        currentSelectedTab=hunterKey;
-                      });
-                    }
-                )).toList(),
+              decoration: const BoxDecoration(color: Color.fromRGBO(50, 50, 50, 0.5)),
+              child: Align(
+                alignment: Alignment.topLeft,
+                child: Container(
+                  decoration: const BoxDecoration(color: Colors.white),
+                  width: MediaQuery.of(context).size.width,
+                  height: overlayAnimation is Animation ? overlayAnimation!.value / 8 : 0,
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: hunterRoundTables.keys.map((hunterKey) => PubBadge(
+                        active: currentSelectedTab == hunterKey,
+                        title: hunterRoundTables[hunterKey]!,
+                        setTitle: () {
+                          setState(() {
+                            currentSelectedTab=hunterKey;
+                          });
+                        }
+                    )).toList(),
+                  ),
+                ),
               ),
             )
           );
