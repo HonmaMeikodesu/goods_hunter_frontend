@@ -62,7 +62,7 @@ class _HunterPubRouteState extends State with TickerProviderStateMixin {
   @override
   void initState() {
     animationController = AnimationController(
-        duration: const Duration(milliseconds: 500),
+        duration: const Duration(milliseconds: 300),
         vsync: this,
     );
     curvedAnimation = CurvedAnimation(parent: animationController, curve: Curves.easeOut);
@@ -164,29 +164,42 @@ class _HunterPubRouteState extends State with TickerProviderStateMixin {
             top: bannerHeight,
               width: MediaQuery.of(context).size.width,
               height: overlayAnimation is Animation ? overlayAnimation!.value : 0,
-            child: Container(
-              decoration: const BoxDecoration(color: Color.fromRGBO(50, 50, 50, 0.5)),
-              child: Align(
-                alignment: Alignment.topLeft,
-                child: Container(
-                  decoration: const BoxDecoration(color: Colors.white),
-                  width: MediaQuery.of(context).size.width,
-                  height: overlayAnimation is Animation ? overlayAnimation!.value / 8 : 0,
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: hunterRoundTables.keys.map((hunterKey) => PubBadge(
-                        active: currentSelectedTab == hunterKey,
-                        title: hunterRoundTables[hunterKey]!,
-                        setTitle: () {
-                          setState(() {
-                            currentSelectedTab=hunterKey;
-                          });
-                        }
-                    )).toList(),
+            child: GestureDetector(
+              onTap: () {
+                setState(() {
+                  expanded = false;
+                  animationController.reverse();
+                });
+              },
+              child: Container(
+                decoration: const BoxDecoration(color: Color.fromRGBO(50, 50, 50, 0.5)),
+                child: Align(
+                  alignment: Alignment.topLeft,
+                  child: GestureDetector(
+                    onTap: () {
+                      // do nothing
+                    },
+                    child: Container(
+                      decoration: const BoxDecoration(color: Colors.white),
+                      width: MediaQuery.of(context).size.width,
+                      height: overlayAnimation is Animation ? overlayAnimation!.value / 8 : 0,
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: hunterRoundTables.keys.map((hunterKey) => PubBadge(
+                            active: currentSelectedTab == hunterKey,
+                            title: hunterRoundTables[hunterKey]!,
+                            setTitle: () {
+                              setState(() {
+                                currentSelectedTab=hunterKey;
+                              });
+                            }
+                        )).toList(),
+                      ),
+                    ),
                   ),
                 ),
               ),
-            )
+            ),
           );
         })
       ],
