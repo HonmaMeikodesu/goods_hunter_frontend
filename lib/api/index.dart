@@ -1,5 +1,8 @@
+import 'dart:convert';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:goods_hunter/models/index.dart';
 
 import "./request.dart";
 
@@ -21,4 +24,9 @@ Future<void> registerApi({required String email, required String password, Build
     method: "POST",
     contentType: Headers.formUrlEncodedContentType,
   ), context: context);
+}
+
+Future<List<MercariHunter>> getMercariHunterListApi({BuildContext? context}) {
+
+  return Request.fetch("/listGoodsWatcher", options: Options(method: "GET"), context: context).then((value) => value);
 }

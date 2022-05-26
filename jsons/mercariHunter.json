@@ -1,0 +1,10 @@
+{
+  "hunterInstanceId": "a15f76fe-f809-4b98-a113-ca89358458c9",
+  "lastShotAt": "2022-05-26T04:58:19.000Z",
+  "freezingStart": "01:00:00",
+  "freezingEnd": "09:00:00",
+  "schedule": "*/30 * * * *",
+  "url": "https://api.mercari.jp/search_index/search?keyword=本間芽衣子&t3_category_id=733&t2_category_id=81&t1_category_id=1328&category_id=733&status=on_sale",
+  "createdAt": "2022-05-25T11:55:52.165Z",
+  "updatedAt": "2022-05-26T05:00:03.000Z"
+}

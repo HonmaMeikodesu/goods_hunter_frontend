@@ -1,8 +1,10 @@
 import 'package:flutter/cupertino.dart';
+import 'package:goods_hunter/pages/mercariHunter/hunterList/index.dart';
 
 class MercariHunter extends StatefulWidget {
 
-  late final int num;
+  MercariHunter({Key? key}) : super(key: key);
+
   @override
   State<StatefulWidget> createState() => _MercariHunterState();
 }
@@ -10,7 +12,7 @@ class MercariHunter extends StatefulWidget {
 class _MercariHunterState extends State<MercariHunter> {
   @override
   Widget build(BuildContext context) {
-
+    return HunterList();
   }
 
 }
