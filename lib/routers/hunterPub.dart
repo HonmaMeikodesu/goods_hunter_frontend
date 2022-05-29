@@ -1,9 +1,7 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
 
-import 'package:goods_hunter/pages/mercariHunter/hunterList/index.dart';
+import 'package:goods_hunter/pages/mercariHunter/index.dart';
 
 class HunterPubRoute extends StatefulWidget {
   const HunterPubRoute({Key? key}) : super(key: key);
@@ -149,7 +147,7 @@ class _HunterPubRouteState extends State with TickerProviderStateMixin {
                   ],
                 ),
                 body: TabBarView(children: [
-                  HunterList(),
+                  MercariHunter(),
                   Text("123"),
                   Text("123"),
                   Text("123"),

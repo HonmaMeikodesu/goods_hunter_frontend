@@ -53,7 +53,7 @@ class Request {
     try {
       var requestInstance = await Request.getInstance();
       var rawResponse = await requestInstance.request<T>(path, data: data, options: options, queryParameters: queryParameters);
-      return rawResponse.data!;
+      return rawResponse.data;
     } on DioError catch (e) {
       if (context is BuildContext) {
         final errorMsg = "请求失败, 错误信息:${e.message}";

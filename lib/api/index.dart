@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:goods_hunter/models/index.dart';
@@ -27,6 +25,8 @@ Future<void> registerApi({required String email, required String password, Build
 }
 
 Future<List<MercariHunter>> getMercariHunterListApi({BuildContext? context}) {
-
-  return Request.fetch("/listGoodsWatcher", options: Options(method: "GET"), context: context).then((value) => value);
+  return Request.fetch("/goods/listGoodsWatcher", options: Options(method: "GET"), queryParameters: { "type": "Mercari" }, context: context).then((value) {
+    var iterableList = (value["data"] as List<dynamic>).map((val) => MercariHunter.fromJson(val));
+    return iterableList.toList();
+  });
 }
