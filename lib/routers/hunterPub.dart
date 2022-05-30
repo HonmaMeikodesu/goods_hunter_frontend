@@ -146,12 +146,14 @@ class _HunterPubRouteState extends State with TickerProviderStateMixin {
                     })
                   ],
                 ),
-                body: TabBarView(children: [
-                  MercariHunter(),
-                  Text("123"),
-                  Text("123"),
-                  Text("123"),
-                ]),
+                body: TabBarView(
+                    physics: NeverScrollableScrollPhysics(),
+                    children: [
+                      MercariHunter(),
+                      Text("123"),
+                      Text("123"),
+                      Text("123"),
+                    ]),
                 floatingActionButton: FloatingActionButton(
                   tooltip: 'todo',
                   onPressed: () {},

@@ -19,9 +19,25 @@ class _HunterListState extends State<HunterList> {
       margin: EdgeInsets.only(bottom: 16),
       child: HunterDogTag(keyword: hunter.url, lastUpdatedAt: hunter.lastShotAt, status: HunterStatus.hunting, schedule: hunter.schedule),
     )).toList();
-    return ListView(
+    return ListView.builder(
+      itemCount: listItems.length,
+      itemBuilder: (BuildContext context, int index) {
+        if (index < listItems.length) {
+          return listItems[index];
+        } else {
+          return Container(
+              alignment: Alignment.center,
+              height: 100,
+              padding: EdgeInsets.all(16.0),
+              child: Text(
+              "我是有底线的",
+              style: TextStyle(color: Colors.grey),
+              )
+          );
+        }
+      },
+      itemExtent: 116,
       padding: EdgeInsets.all(16),
-      children: listItems
     );
   }
 }

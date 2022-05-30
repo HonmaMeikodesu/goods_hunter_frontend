@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
+import 'package:goods_hunter/utils/getDateDiff.dart';
 
 enum HunterStatus { sleeping, hunting }
 
@@ -16,6 +18,7 @@ class HunterDogTag extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    String displayKeyword = Uri.parse(keyword).queryParameters["keyword"] ?? "";
     return (
       DecoratedBox(
         decoration: BoxDecoration(
@@ -44,8 +47,19 @@ class HunterDogTag extends StatelessWidget {
                 top: 8,
                 child: Row(
                   children: [
-                    Text(keyword, style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),),
+                    ConstrainedBox(
+                      constraints: const BoxConstraints(
+                        maxWidth: 120,
+                      ),
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Text(displayKeyword, style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+                      ) ,
+                    ),
                     Container(
+                      constraints: const BoxConstraints(
+                        maxWidth: 160,
+                      ),
                       margin: const EdgeInsets.only(left: 16),
                       decoration: BoxDecoration(
                         border: Border.all(color: Color.fromRGBO(0, 108, 255, 1)),
@@ -53,7 +67,7 @@ class HunterDogTag extends StatelessWidget {
                       ),
                       child: Container(
                         padding: EdgeInsets.only(left: 8, top: 4, right: 8, bottom: 4),
-                        child: Text("最后更新于$lastUpdatedAt", style: TextStyle(fontWeight: FontWeight.w500, color:  Color.fromRGBO(0, 108, 255, 1))),
+                        child: Text("更新于${getDateDiff(lastUpdatedAt)}", style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color:  Color.fromRGBO(0, 108, 255, 1))),
                       )
                     )
                   ],
