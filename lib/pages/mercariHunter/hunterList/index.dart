@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:goods_hunter/models/index.dart';
 import 'package:goods_hunter/pages/mercariHunter/hunterList/hunterDogTag.dart';
+import 'package:goods_hunter/pages/mercariHunter/hunterList/hunterListItem.dart';
 
 class HunterList extends StatefulWidget {
 
@@ -15,10 +16,7 @@ class HunterList extends StatefulWidget {
 class _HunterListState extends State<HunterList> {
   @override
   Widget build(BuildContext context) {
-    List<Widget> listItems = widget.mercariHunterList.map((hunter) => Container(
-      margin: EdgeInsets.only(bottom: 16),
-      child: HunterDogTag(keyword: hunter.url, lastUpdatedAt: hunter.lastShotAt, status: HunterStatus.hunting, schedule: hunter.schedule),
-    )).toList();
+    List<Widget> listItems = widget.mercariHunterList.map((hunter) => HunterListItem(hunter: hunter)).toList();
     return ListView.builder(
       itemCount: listItems.length,
       itemBuilder: (BuildContext context, int index) {
