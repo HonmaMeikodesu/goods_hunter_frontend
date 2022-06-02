@@ -6,7 +6,10 @@ import 'hunterDogTag.dart';
 class HunterListItem extends StatefulWidget {
   final models.MercariHunter hunter;
 
-  const HunterListItem({Key? key, required this.hunter}): super(key: key);
+  final void Function(String hunterId) onDeleteHunter;
+
+
+  const HunterListItem({Key? key, required this.hunter, required this.onDeleteHunter }): super(key: key);
 
   @override
   State<StatefulWidget> createState() => _HunterListItemState();
@@ -87,7 +90,9 @@ class _HunterListItemState extends State<HunterListItem> {
                             ),
                             IconButton(
                                 color: Colors.redAccent,
-                                onPressed: () {},
+                                onPressed: () {
+                                  widget.onDeleteHunter(hunter.hunterInstanceId);
+                                },
                                 icon: Icon(Icons.delete_forever)
                             ),
                           ],

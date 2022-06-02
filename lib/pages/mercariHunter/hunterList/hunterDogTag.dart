@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:goods_hunter/utils/getDateDiff.dart';
 
 enum HunterStatus { sleeping, hunting }
@@ -10,7 +9,7 @@ class HunterDogTag extends StatelessWidget {
 
   final String schedule;
 
-  final String lastUpdatedAt;
+  final String? lastUpdatedAt;
 
   final HunterStatus status;
 
@@ -19,6 +18,7 @@ class HunterDogTag extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     String displayKeyword = Uri.parse(keyword).queryParameters["keyword"] ?? "";
+    String ? lastUpdatedAt = this.lastUpdatedAt;
     return (
       DecoratedBox(
         decoration: BoxDecoration(
@@ -67,7 +67,7 @@ class HunterDogTag extends StatelessWidget {
                       ),
                       child: Container(
                         padding: EdgeInsets.only(left: 8, top: 4, right: 8, bottom: 4),
-                        child: Text("更新于${getDateDiff(lastUpdatedAt)}", style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color:  Color.fromRGBO(0, 108, 255, 1))),
+                        child: lastUpdatedAt is String ? Text("更新于${getDateDiff(lastUpdatedAt)}", style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color:  Color.fromRGBO(0, 108, 255, 1))) : Text("没有数据", style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color:  Color.fromRGBO(0, 108, 255, 1))),
                       )
                     )
                   ],

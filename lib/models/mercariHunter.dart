@@ -7,7 +7,7 @@ class MercariHunter {
   MercariHunter();
 
   late String hunterInstanceId;
-  late String lastShotAt;
+  late String? lastShotAt;
   late String freezingStart;
   late String freezingEnd;
   late String schedule;

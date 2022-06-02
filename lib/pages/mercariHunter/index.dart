@@ -21,7 +21,12 @@ class _MercariHunterState extends State<MercariHunter> {
     }));
   }
   Widget build(BuildContext context) {
-    return HunterList(mercariHunterList: mercariHunterList);
+    return HunterList(mercariHunterList: mercariHunterList, onDeleteHunter: (String hunterId) {
+      deleteMercariHunterApi(context: context, hunterId: hunterId).then((value) {
+        return getMercariHunterListApi();
+      }).then((value) => setState(() {
+        mercariHunterList = value;
+      }));
+    });
   }
-
 }

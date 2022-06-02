@@ -9,7 +9,7 @@ part of 'mercariHunter.dart';
 MercariHunter _$MercariHunterFromJson(Map<String, dynamic> json) =>
     MercariHunter()
       ..hunterInstanceId = json['hunterInstanceId'] as String
-      ..lastShotAt = json['lastShotAt'] as String
+      ..lastShotAt = json['lastShotAt']
       ..freezingStart = json['freezingStart'] as String
       ..freezingEnd = json['freezingEnd'] as String
       ..schedule = json['schedule'] as String

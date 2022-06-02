@@ -48,7 +48,7 @@ class _LoginRouterState extends State<LoginRouter> {
   void onLoginSubmitted(BuildContext context) async {
     if(Form.of(context)!.validate()) {
       try {
-        showLoading(context, "登录中");
+        showLoading(context: context, title: "登录中");
         await loginApi(email: email, password: password, context: context).then((_) {
           showMessage(
               context: context,
@@ -142,7 +142,7 @@ class _RegisterRouterState extends State<RegisterRouter> {
 
   void onRegisterSubmitted(BuildContext context) async {
     if(Form.of(context)!.validate()) {
-      showLoading(context, "注册中");
+      showLoading(context: context, title: "注册中");
       try {
         await registerApi(email: email, password: password, context: context).then((_) {
           showMessage(context: context, title: "注册成功", callback:  (){

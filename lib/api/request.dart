@@ -57,23 +57,7 @@ class Request {
     } on DioError catch (e) {
       if (context is BuildContext) {
         final errorMsg = "请求失败, 错误信息:${e.message}";
-        try {
-          showMessage(context: context, title: errorMsg, callback: (){});
-        } catch (e) {
-          showDialog(context: context, builder: (context) {
-            return AlertDialog(
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Center(
-                    child: Icon(Icons.error),
-                  ),
-                  Text(errorMsg)
-                ],
-              ),
-            );
-          });
-        }
+        showToast(context: context, content: errorMsg, type: toastType.error, closeAfter: 1);
       }
       rethrow;
     }

@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:goods_hunter/models/index.dart';
-import 'package:goods_hunter/pages/mercariHunter/hunterList/hunterDogTag.dart';
 import 'package:goods_hunter/pages/mercariHunter/hunterList/hunterListItem.dart';
 
 class HunterList extends StatefulWidget {
 
-  HunterList({Key? key, required this.mercariHunterList}): super(key: key);
+  HunterList({Key? key, required this.mercariHunterList, required this.onDeleteHunter }): super(key: key);
 
   late List<MercariHunter> mercariHunterList = [];
+
+  final void Function(String hunterId) onDeleteHunter;
 
   @override
   State<StatefulWidget> createState() => _HunterListState();
@@ -16,7 +17,7 @@ class HunterList extends StatefulWidget {
 class _HunterListState extends State<HunterList> {
   @override
   Widget build(BuildContext context) {
-    List<Widget> listItems = widget.mercariHunterList.map((hunter) => HunterListItem(hunter: hunter)).toList();
+    List<Widget> listItems = widget.mercariHunterList.map((hunter) => HunterListItem(key: Key(hunter.hunterInstanceId), hunter: hunter ,onDeleteHunter: widget.onDeleteHunter)).toList();
     return ListView.builder(
       itemCount: listItems.length,
       itemBuilder: (BuildContext context, int index) {
