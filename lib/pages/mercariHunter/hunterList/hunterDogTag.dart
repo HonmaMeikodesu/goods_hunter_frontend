@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:goods_hunter/pages/mercariHunter/hunterIdCard/ghost.dart';
 import 'package:goods_hunter/utils/getDateDiff.dart';
 
 enum HunterStatus { sleeping, hunting }
@@ -20,125 +21,149 @@ class HunterDogTag extends StatelessWidget {
     String displayKeyword = Uri.parse(keyword).queryParameters["keyword"] ?? "";
     String ? lastUpdatedAt = this.lastUpdatedAt;
     return (
-      DecoratedBox(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          border: Border.all(color: Color.fromRGBO(218,218,220, 0.7)),
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(20),
-            bottomRight: Radius.circular(20),
-          ),
-          boxShadow:[
-            BoxShadow(
-              color: Color.fromRGBO(142, 142, 142, 1.0),
-              offset: Offset(2, 2),
-              blurRadius: 5,
-              spreadRadius: 2,
+      GestureDetector(
+        onDoubleTap: () {
+          RenderBox box = context?.findRenderObject() as RenderBox;
+          Offset globalPos = box.localToGlobal(Offset.zero);
+          Size screenSize = MediaQuery.of(context).size;
+          Navigator.of(context).push(
+            PageRouteBuilder(
+                pageBuilder: (ctx, animation, secondAnimation) {
+                  return HunterIdCardGhost(
+                      rect: RelativeRect.fromLTRB(globalPos.dx, globalPos.dy, screenSize.width - globalPos.dx - box.size.width, screenSize.height - globalPos.dy - box.size.height),
+                      title: displayKeyword,
+                      animation: animation,
+                  );
+                },
+                transitionDuration: Duration(milliseconds: 500),
+                transitionsBuilder: (ctx, animation, secondAnimation, child) {
+                  return FadeTransition (
+                      opacity: animation,
+                      child: child);
+                }
             )
-          ],
-        ),
-        child: Container(
-          height: 100,
-          padding: EdgeInsets.only(top: 8, bottom: 8, left: 24, right: 0),
-          child: Stack(
-            fit: StackFit.expand,
-            children: [
-              Positioned(
-                top: 8,
-                child: Row(
-                  children: [
-                    ConstrainedBox(
-                      constraints: const BoxConstraints(
-                        maxWidth: 120,
-                      ),
-                      child: SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: Text(displayKeyword, style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-                      ) ,
-                    ),
-                    Container(
-                      constraints: const BoxConstraints(
-                        maxWidth: 160,
-                      ),
-                      margin: const EdgeInsets.only(left: 16),
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Color.fromRGBO(0, 108, 255, 1)),
-                        borderRadius: BorderRadius.all(Radius.circular(20)),
-                      ),
-                      child: Container(
-                        padding: EdgeInsets.only(left: 8, top: 4, right: 8, bottom: 4),
-                        child: lastUpdatedAt is String ? Text("更新于${getDateDiff(lastUpdatedAt)}", style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color:  Color.fromRGBO(0, 108, 255, 1))) : Text("没有数据", style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color:  Color.fromRGBO(0, 108, 255, 1))),
-                      )
-                    )
-                  ],
-                ),
+          );
+        },
+        child: DecoratedBox(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              border: Border.all(color: Color.fromRGBO(218,218,220, 0.7)),
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(20),
+                bottomRight: Radius.circular(20),
               ),
-              Positioned(
-                bottom: 8,
-                child: Text("频率: $schedule", style: const TextStyle(color: Color.fromRGBO(201, 201, 205, 1))),
-              ),
-              Stack(
-                alignment: Alignment(1, 0),
+              boxShadow:[
+                BoxShadow(
+                  color: Color.fromRGBO(142, 142, 142, 1.0),
+                  offset: Offset(2, 2),
+                  blurRadius: 5,
+                  spreadRadius: 2,
+                )
+              ],
+            ),
+            child: Container(
+              height: 100,
+              padding: EdgeInsets.only(top: 8, bottom: 8, left: 24, right: 0),
+              child: Stack(
+                fit: StackFit.expand,
                 children: [
                   Positioned(
-                      right: 0,
-                      child: Stack(
+                    top: 8,
+                    child: Row(
+                      children: [
+                        ConstrainedBox(
+                          constraints: const BoxConstraints(
+                            maxWidth: 120,
+                          ),
+                          child: SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: Text(displayKeyword, style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+                          ) ,
+                        ),
+                        Container(
+                            constraints: const BoxConstraints(
+                              maxWidth: 160,
+                            ),
+                            margin: const EdgeInsets.only(left: 16),
+                            decoration: BoxDecoration(
+                              border: Border.all(color: Color.fromRGBO(0, 108, 255, 1)),
+                              borderRadius: BorderRadius.all(Radius.circular(20)),
+                            ),
+                            child: Container(
+                              padding: EdgeInsets.only(left: 8, top: 4, right: 8, bottom: 4),
+                              child: lastUpdatedAt is String ? Text("更新于${getDateDiff(lastUpdatedAt)}", style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color:  Color.fromRGBO(0, 108, 255, 1))) : Text("没有数据", style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color:  Color.fromRGBO(0, 108, 255, 1))),
+                            )
+                        )
+                      ],
+                    ),
+                  ),
+                  Positioned(
+                    bottom: 8,
+                    child: Text("频率: $schedule", style: const TextStyle(color: Color.fromRGBO(201, 201, 205, 1))),
+                  ),
+                  Stack(
+                    alignment: Alignment(1, 0),
                     children: [
                       Positioned(
                           right: 0,
-                          child: Container(
-                          decoration: const BoxDecoration(
-                            color: Colors.redAccent,
-                          ),
-                          width: 70,
-                          height: 24,
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisAlignment: MainAxisAlignment.end,
+                          child: Stack(
                             children: [
-                              Text(status.name, style: const TextStyle(
-                                fontWeight: FontWeight.w400,
-                                color: Colors.white
-                              )),
+                              Positioned(
+                                  right: 0,
+                                  child: Container(
+                                      decoration: const BoxDecoration(
+                                        color: Colors.redAccent,
+                                      ),
+                                      width: 70,
+                                      height: 24,
+                                      child: Row(
+                                        crossAxisAlignment: CrossAxisAlignment.center,
+                                        mainAxisAlignment: MainAxisAlignment.end,
+                                        children: [
+                                          Text(status.name, style: const TextStyle(
+                                              fontWeight: FontWeight.w400,
+                                              color: Colors.white
+                                          )),
+                                          Container(
+                                            width: 6,
+                                          )
+                                        ],
+                                      )
+                                  )),
                               Container(
-                                width: 6,
+                                width: 71,
+                                height: 24,
+                                decoration: const BoxDecoration(
+                                    border: Border(
+                                        top: BorderSide(
+                                            width: 12,
+                                            color: Colors.transparent
+                                        ),
+                                        right: BorderSide(
+                                            width: 0,
+                                            color: Colors.transparent
+                                        ),
+                                        bottom: BorderSide(
+                                            width: 12,
+                                            color: Colors.transparent
+                                        ),
+                                        left: BorderSide(
+                                            width: 12,
+                                            color: Colors.white
+                                        )
+                                    )
+                                ),
                               )
                             ],
                           )
-                      )),
-                      Container(
-                        width: 71,
-                        height: 24,
-                        decoration: const BoxDecoration(
-                            border: Border(
-                                top: BorderSide(
-                                    width: 12,
-                                    color: Colors.transparent
-                                ),
-                                right: BorderSide(
-                                    width: 0,
-                                    color: Colors.transparent
-                                ),
-                                bottom: BorderSide(
-                                    width: 12,
-                                    color: Colors.transparent
-                                ),
-                                left: BorderSide(
-                                    width: 12,
-                                    color: Colors.white
-                                )
-                            )
-                        ),
                       )
+
                     ],
                   )
-                  )
-
                 ],
-              )
-            ],
-          ),
-        )
+              ),
+            )
+        ),
       )
     );
   }
