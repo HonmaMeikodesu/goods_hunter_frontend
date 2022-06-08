@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:goods_hunter/pages/mercariHunter/hunterIdCard/ghost.dart';
+import 'package:goods_hunter/pages/mercariHunter/hunterIdCard/index.dart';
 import 'package:goods_hunter/utils/getDateDiff.dart';
 
 enum HunterStatus { sleeping, hunting }
@@ -12,37 +13,20 @@ class HunterDogTag extends StatelessWidget {
 
   final String? lastUpdatedAt;
 
+
+  final void Function() onCheckHunterIdCard;
+
   final HunterStatus status;
 
-  const HunterDogTag({Key? key, required this.keyword, required this.lastUpdatedAt, required this.status, required this.schedule  }): super(key: key);
+  const HunterDogTag({Key? key, required this.keyword, required this.lastUpdatedAt, required this.status, required this.schedule, required this.onCheckHunterIdCard  }): super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    String displayKeyword = Uri.parse(keyword).queryParameters["keyword"] ?? "";
     String ? lastUpdatedAt = this.lastUpdatedAt;
     return (
       GestureDetector(
         onDoubleTap: () {
-          RenderBox box = context?.findRenderObject() as RenderBox;
-          Offset globalPos = box.localToGlobal(Offset.zero);
-          Size screenSize = MediaQuery.of(context).size;
-          Navigator.of(context).push(
-            PageRouteBuilder(
-                pageBuilder: (ctx, animation, secondAnimation) {
-                  return HunterIdCardGhost(
-                      rect: RelativeRect.fromLTRB(globalPos.dx, globalPos.dy, screenSize.width - globalPos.dx - box.size.width, screenSize.height - globalPos.dy - box.size.height),
-                      title: displayKeyword,
-                      animation: animation,
-                  );
-                },
-                transitionDuration: Duration(milliseconds: 500),
-                transitionsBuilder: (ctx, animation, secondAnimation, child) {
-                  return FadeTransition (
-                      opacity: animation,
-                      child: child);
-                }
-            )
-          );
+          onCheckHunterIdCard();
         },
         child: DecoratedBox(
             decoration: BoxDecoration(
@@ -77,7 +61,7 @@ class HunterDogTag extends StatelessWidget {
                           ),
                           child: SingleChildScrollView(
                             scrollDirection: Axis.horizontal,
-                            child: Text(displayKeyword, style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+                            child: Text(keyword, style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
                           ) ,
                         ),
                         Container(

@@ -28,9 +28,17 @@ class HunterIdCardGhost extends StatelessWidget {
               PositionedTransition(
                   rect: RelativeRectTween(begin: convertedRect, end: RelativeRect.fill).animate(animation),
                   child: Container(
-                    decoration: BoxDecoration(color: Colors.lightBlue),
+                    decoration: BoxDecoration(color: Colors.white),
                     padding: EdgeInsets.only(left: 24, top: 16),
-                    child:  Text(title, style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black)),
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(
+                        maxWidth: 120,
+                      ),
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Text(title, style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black)),
+                      ) ,
+                    ),
                   )
               )
             ],
