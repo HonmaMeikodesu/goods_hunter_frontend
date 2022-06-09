@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:goods_hunter/pages/mercariHunter/hunterIdCard/ghost.dart';
 import '../../../models/index.dart' as model;
+import "dart:math" as math;
 
 class HunterIdCard extends StatefulWidget {
 
@@ -15,18 +16,26 @@ class HunterIdCard extends StatefulWidget {
   State<StatefulWidget> createState() => _HunterIdCardState();
 }
 
+enum KeywordInputStatus {
+  read,
+  write
+}
+
 class _HunterIdCardState extends State<HunterIdCard>
     with TickerProviderStateMixin {
   late final AnimationController editKeywordAnimation;
   late bool pendingForTransition;
-  
-  String keywordInputStatus = "read";
+  final TextEditingController keywordInputController = TextEditingController();
+  late String keyword;
+
+  KeywordInputStatus keywordInputStatus = KeywordInputStatus.read;
 
   @override
   initState() {
     super.initState();
-    editKeywordAnimation = AnimationController(vsync: this, duration: const Duration(milliseconds: 100));
+    editKeywordAnimation = AnimationController(vsync: this, duration: const Duration(milliseconds: 500), lowerBound: 0, upperBound: 2);
     pendingForTransition = widget.transitionAnimation is Animation<double> && widget.transitionRect is RelativeRect;
+    keyword = Uri.parse(widget.hunterInfo.url).queryParameters["keyword"] ?? "";
   }
 
   @override
@@ -36,7 +45,6 @@ class _HunterIdCardState extends State<HunterIdCard>
   }
 
   buildTransition() {
-    String keyword = Uri.parse(widget.hunterInfo.url).queryParameters["keyword"] ?? "";
     widget.transitionAnimation!.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
         setState(() {
@@ -48,9 +56,10 @@ class _HunterIdCardState extends State<HunterIdCard>
   }
 
   buildPage() {
-    String keyword = Uri.parse(widget.hunterInfo.url).queryParameters["keyword"] ?? "";
+    keywordInputController.text = keyword;
     return SafeArea(
         child: Scaffold(
+          appBar: AppBar(title: Text("asdads"),),
           body: Container(
             padding: EdgeInsets.all(12),
             decoration: BoxDecoration(
@@ -59,6 +68,7 @@ class _HunterIdCardState extends State<HunterIdCard>
             child: Column(
               children: [
                 Container(
+                  height: 60,
                   padding: EdgeInsets.all(12),
                   decoration: BoxDecoration(
                     color: Colors.white,
@@ -70,7 +80,21 @@ class _HunterIdCardState extends State<HunterIdCard>
                     children: [
                       Expanded(
                         flex: 3,
-                        child: SingleChildScrollView(
+                        child: keywordInputStatus == KeywordInputStatus.write ? Focus(
+                          onFocusChange: (flag) {
+                            if (!flag) {
+                              setState(() {
+                                keywordInputStatus = KeywordInputStatus.read;
+                              });
+                            }
+                          },
+                          child: TextField(
+                            autofocus: true,
+                            textAlignVertical: TextAlignVertical.top,
+                            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                            controller: keywordInputController,
+                          ),
+                        ) : SingleChildScrollView(
                           scrollDirection: Axis.horizontal,
                           child: Text(keyword,
                               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
@@ -80,14 +104,15 @@ class _HunterIdCardState extends State<HunterIdCard>
                         flex: 1,
                         child: GestureDetector(
                           onTap: () {
-                            if (keywordInputStatus == "read") {
+                            if (keywordInputStatus == KeywordInputStatus.read) {
                               setState(() {
-                                keywordInputStatus = "write";
+                                keywordInputStatus = KeywordInputStatus.write;
                                 editKeywordAnimation.forward();
                               });
                             } else {
                               setState(() {
-                                keywordInputStatus = "read";
+                                keyword = keywordInputController.text;
+                                keywordInputStatus = KeywordInputStatus.read;
                                 editKeywordAnimation.reverse();
                               });
                             }
@@ -97,8 +122,13 @@ class _HunterIdCardState extends State<HunterIdCard>
                               child: AnimatedBuilder(
                                 animation: editKeywordAnimation,
                                 builder: (context, child) {
+                                  Matrix4 transformMatrix = Matrix4.identity();
+                                  transformMatrix.setEntry(3, 2, 0.02);
+                                  transformMatrix.rotateY(math.pi / 2 * math.sin(editKeywordAnimation.value * (math.pi / 2)));
                                   if (editKeywordAnimation.value < 0.5) {
                                     return Container(
+                                      transform: transformMatrix,
+                                      transformAlignment: Alignment.center,
                                       decoration: BoxDecoration(
                                         color: Colors.orangeAccent,
                                         borderRadius: BorderRadius.all(Radius.circular(20)),
@@ -108,6 +138,8 @@ class _HunterIdCardState extends State<HunterIdCard>
                                     );
                                   } else {
                                     return Container(
+                                      transform: transformMatrix,
+                                      transformAlignment: Alignment.center,
                                       decoration: BoxDecoration(
                                         color: Colors.green,
                                         borderRadius: BorderRadius.all(Radius.circular(20)),

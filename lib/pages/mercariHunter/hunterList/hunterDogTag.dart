@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:goods_hunter/pages/mercariHunter/hunterIdCard/ghost.dart';
-import 'package:goods_hunter/pages/mercariHunter/hunterIdCard/index.dart';
 import 'package:goods_hunter/utils/getDateDiff.dart';
 
 enum HunterStatus { sleeping, hunting }
