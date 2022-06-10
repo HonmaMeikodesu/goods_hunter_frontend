@@ -123,7 +123,8 @@ class _HunterListItemState extends State<HunterListItem> {
                                             transitionRect: RelativeRect.fromLTRB(globalPos.dx, globalPos.dy, screenSize.width - globalPos.dx - box.size.width, screenSize.height - globalPos.dy - box.size.height),
                                         );
                                       },
-                                      transitionDuration: Duration(milliseconds: 500),
+                                      transitionDuration: Duration(milliseconds: 300),
+                                      reverseTransitionDuration: Duration(milliseconds: 550),
                                       transitionsBuilder: (ctx, animation, secondAnimation, child) {
                                         return FadeTransition (
                                             opacity: animation,

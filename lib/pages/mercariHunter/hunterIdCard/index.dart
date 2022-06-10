@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:goods_hunter/pages/mercariHunter/hunterIdCard/ghost.dart';
+import 'package:goods_hunter/pages/mercariHunter/hunterIdCard/goodsFilter.dart';
 import '../../../models/index.dart' as model;
 import "dart:math" as math;
 
@@ -27,6 +28,7 @@ class _HunterIdCardState extends State<HunterIdCard>
   late bool pendingForTransition;
   final TextEditingController keywordInputController = TextEditingController();
   late String keyword;
+  late String? goodsStatus;
 
   KeywordInputStatus keywordInputStatus = KeywordInputStatus.read;
 
@@ -35,7 +37,20 @@ class _HunterIdCardState extends State<HunterIdCard>
     super.initState();
     editKeywordAnimation = AnimationController(vsync: this, duration: const Duration(milliseconds: 500), lowerBound: 0, upperBound: 2);
     pendingForTransition = widget.transitionAnimation is Animation<double> && widget.transitionRect is RelativeRect;
-    keyword = Uri.parse(widget.hunterInfo.url).queryParameters["keyword"] ?? "";
+    var uriObj = Uri.parse(widget.hunterInfo.url).queryParameters;
+    keyword = uriObj["keyword"] ?? "";
+    goodsStatus = uriObj["item_condition_id"];
+    widget.transitionAnimation!.addStatusListener((status) {
+      if (status == AnimationStatus.completed) {
+        setState(() {
+          pendingForTransition = false;
+        });
+      } else {
+        setState(() {
+          pendingForTransition = true;
+        });
+      }
+    });
   }
 
   @override
@@ -45,18 +60,35 @@ class _HunterIdCardState extends State<HunterIdCard>
   }
 
   buildTransition() {
-    widget.transitionAnimation!.addStatusListener((status) {
-      if (status == AnimationStatus.completed) {
-        setState(() {
-          pendingForTransition = false;
-        });
-      }
-    });
+    print("haha");
     return HunterIdCardGhost(rect: widget.transitionRect!, title: keyword, animation: widget.transitionAnimation!);
   }
 
   buildPage() {
     keywordInputController.text = keyword;
+    List<Widget> expansionList = [
+      ExpansionTile(
+          maintainState: true,
+          leading: Icon(Icons.filter_alt_rounded, color: Colors.green),
+          title: Text("过滤器", style: TextStyle( fontWeight: FontWeight.w400, fontSize: 18)),
+          subtitle: Text("指定搜索的筛选条件", style: TextStyle( fontWeight: FontWeight.w400, fontSize: 12, color: Colors.grey)),
+          tilePadding: EdgeInsets.all(12),
+          children: [
+            ExpansionTile(
+              maintainState: true,
+              title: Text("商品状态"),
+              trailing: Icon(Icons.category_outlined, color: Colors.deepOrangeAccent,),
+              controlAffinity: ListTileControlAffinity.leading,
+              children: [
+                GoodsStatusFilter(paramValue: goodsStatus , onChange: (paramValue) {
+                  setState(() {
+                    goodsStatus = paramValue;
+                  });
+                })
+              ],
+            )
+          ]),
+    ];
     return SafeArea(
         child: Scaffold(
           body: Container(
@@ -164,8 +196,9 @@ class _HunterIdCardState extends State<HunterIdCard>
                     ),
                     padding: EdgeInsets.all(12),
                     child: ListView.builder(
+                        itemCount: expansionList.length,
                         itemBuilder: (context, index) {
-                          return Text("123");
+                          return expansionList[index];
                         }
                     ),
                   ),
