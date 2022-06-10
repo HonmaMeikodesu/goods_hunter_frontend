@@ -59,7 +59,6 @@ class _HunterIdCardState extends State<HunterIdCard>
     keywordInputController.text = keyword;
     return SafeArea(
         child: Scaffold(
-          appBar: AppBar(title: Text("asdads"),),
           body: Container(
             padding: EdgeInsets.all(12),
             decoration: BoxDecoration(
@@ -155,9 +154,43 @@ class _HunterIdCardState extends State<HunterIdCard>
                       )
                     ],
                   ),
+                ),
+                Expanded(
+                  child: Container(
+                    margin: EdgeInsets.only(top: 12),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.all(Radius.circular(8)),
+                    ),
+                    padding: EdgeInsets.all(12),
+                    child: ListView.builder(
+                        itemBuilder: (context, index) {
+                          return Text("123");
+                        }
+                    ),
+                  ),
                 )
               ],
             ),
+          ),
+          bottomNavigationBar: Flex(
+            direction: Axis.horizontal,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              ElevatedButton(
+                onPressed: () {
+
+                },
+                child: Text("保存"),
+              ),
+              Padding(padding: EdgeInsets.only(left: 24)),
+              OutlinedButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text("取消"),
+              )
+            ],
           ),
         ));
   }
