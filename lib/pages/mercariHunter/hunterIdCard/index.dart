@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:goods_hunter/pages/mercariHunter/hunterIdCard/ghost.dart';
 import 'package:goods_hunter/pages/mercariHunter/hunterIdCard/goodsFilter.dart';
+import 'package:goods_hunter/utils/const.dart';
 import '../../../models/index.dart' as model;
 import "dart:math" as math;
 
@@ -29,6 +30,10 @@ class _HunterIdCardState extends State<HunterIdCard>
   final TextEditingController keywordInputController = TextEditingController();
   late String keyword;
   late String? goodsStatus;
+  late String? salesStatus;
+  late String? deliveryStatus;
+  late String? minPrice;
+  late String? maxPrice;
 
   KeywordInputStatus keywordInputStatus = KeywordInputStatus.read;
 
@@ -40,6 +45,10 @@ class _HunterIdCardState extends State<HunterIdCard>
     var uriObj = Uri.parse(widget.hunterInfo.url).queryParameters;
     keyword = uriObj["keyword"] ?? "";
     goodsStatus = uriObj["item_condition_id"];
+    salesStatus = uriObj["status"];
+    deliveryStatus= uriObj["shipping_payer_id"];
+    minPrice = uriObj["price_min"];
+    maxPrice = uriObj["price_max"];
     widget.transitionAnimation!.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
         setState(() {
@@ -60,7 +69,6 @@ class _HunterIdCardState extends State<HunterIdCard>
   }
 
   buildTransition() {
-    print("haha");
     return HunterIdCardGhost(rect: widget.transitionRect!, title: keyword, animation: widget.transitionAnimation!);
   }
 
@@ -80,11 +88,49 @@ class _HunterIdCardState extends State<HunterIdCard>
               trailing: Icon(Icons.category_outlined, color: Colors.deepOrangeAccent,),
               controlAffinity: ListTileControlAffinity.leading,
               children: [
-                GoodsStatusFilter(paramValue: goodsStatus , onChange: (paramValue) {
+                StatusFilter(paramValue: goodsStatus , statusAll: GoodsStatus.all, statusMap: GoodsStatusMap, onChange: (paramValue) {
                   setState(() {
                     goodsStatus = paramValue;
                   });
                 })
+              ],
+            ),
+            ExpansionTile(
+              maintainState: true,
+              title: Text("贩售状况"),
+              trailing: Icon(Icons.shopping_cart, color: Colors.redAccent,),
+              controlAffinity: ListTileControlAffinity.leading,
+              children: [
+                StatusFilter(paramValue: salesStatus , statusAll: SalesStatus.all, statusMap: SalesStatusMap, onChange: (paramValue) {
+                  setState(() {
+                    salesStatus = paramValue;
+                  });
+                })
+              ],
+            ),
+            ExpansionTile(
+              maintainState: true,
+              title: Text("送料承担"),
+              trailing: Icon(Icons.delivery_dining, color: Colors.orangeAccent,),
+              controlAffinity: ListTileControlAffinity.leading,
+              children: [
+                StatusFilter(paramValue: deliveryStatus , statusAll: DeliveryStatus.all, statusMap: DeliveryStatusMap, onChange: (paramValue) {
+                  setState(() {
+                    deliveryStatus = paramValue;
+                  });
+                })
+              ],
+            ),
+            ExpansionTile(
+              maintainState: true,
+              title: Text("价格范围"),
+              trailing: Icon(Icons.attach_money, color: Colors.green,),
+              controlAffinity: ListTileControlAffinity.leading,
+              children: [
+                PriceFilter(
+                  minPrice: minPrice,
+                  maxPrice: maxPrice,
+                )
               ],
             )
           ]),
