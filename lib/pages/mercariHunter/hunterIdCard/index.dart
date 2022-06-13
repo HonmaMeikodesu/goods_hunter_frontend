@@ -244,7 +244,7 @@ class _HunterIdCardState extends State<HunterIdCard>
                     child: ListView.builder(
                         itemCount: expansionList.length,
                         itemBuilder: (context, index) {
-                          return expansionList[index];
+                          return Theme(data: Theme.of(context).copyWith(dividerColor: Colors.transparent), child: expansionList[index]);
                         }
                     ),
                   ),
