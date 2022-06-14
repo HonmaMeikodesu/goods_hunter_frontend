@@ -132,6 +132,15 @@ class _HunterIdCardState extends State<HunterIdCard>
                   maxPrice: maxPrice,
                 )
               ],
+            ),
+            ExpansionTile(
+              maintainState: true,
+              title: Text("高级选项"),
+              trailing: Icon(Icons.developer_mode, color: Colors.grey,),
+              controlAffinity: ListTileControlAffinity.leading,
+              children: [
+                CustomFilter(paramsMap: {"asd": "qwe"})
+              ],
             )
           ]),
     ];

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:goods_hunter/utils/generateRandomString.dart';
 import '../../../utils/const.dart';
 
 class StatusFilter extends StatefulWidget {
@@ -158,8 +159,7 @@ class _PriceFilterState extends State<PriceFilter> {
                         OutlineInputBorder(borderSide: BorderSide(width: 1)),
                     focusedBorder: OutlineInputBorder(
                         borderSide: BorderSide(
-                            width: 1,
-                            color: Theme.of(context).primaryColor))),
+                            width: 1, color: Theme.of(context).primaryColor))),
                 keyboardType: TextInputType.number,
                 controller: minController,
                 inputFormatters: [FilteringTextInputFormatter.digitsOnly],
@@ -183,8 +183,7 @@ class _PriceFilterState extends State<PriceFilter> {
                         OutlineInputBorder(borderSide: BorderSide(width: 1)),
                     focusedBorder: OutlineInputBorder(
                         borderSide: BorderSide(
-                            width: 1,
-                            color: Theme.of(context).primaryColor))),
+                            width: 1, color: Theme.of(context).primaryColor))),
                 keyboardType: TextInputType.number,
                 controller: maxController,
                 inputFormatters: [FilteringTextInputFormatter.digitsOnly],
@@ -195,44 +194,135 @@ class _PriceFilterState extends State<PriceFilter> {
   }
 }
 
+enum paramObj {
+  paramNameController,
+  paramValueController,
+}
+
 class CustomFilter extends StatefulWidget {
   final Map<String, String> paramsMap;
-  CustomFilter({Key? key, required this.paramsMap}): super(key: key);
+
+  const CustomFilter({Key? key, required this.paramsMap}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() => _CustomFilter();
 }
 
 class _CustomFilter extends State<CustomFilter> {
-
-  late final Map<String, String> paramList;
+  late Map<String, String> paramsMap;
+  late List<Map<paramObj, TextEditingController>> controllerList;
+  late List<GlobalKey<FormState>> formKeyList;
 
   @override
   void initState() {
     super.initState();
-    paramList = widget.paramsMap;
+    controllerList = [];
+    paramsMap = {};
+    formKeyList = [];
+    refreshData(widget.paramsMap);
+  }
+
+  refreshData(Map<String, String> newParamsMap) {
+    setState(() {
+      paramsMap = newParamsMap;
+      paramsMap.keys.toList().forEach((key) {
+        controllerList.add({
+          paramObj.paramNameController: TextEditingController(),
+          paramObj.paramValueController: TextEditingController()
+        });
+        formKeyList.add(GlobalKey());
+      });
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-        itemCount: paramList.keys.length,
-        itemBuilder: (context, index) {
-          return Form(
-              child: Row(
-                children: [
-                  Expanded(
-                      child: Padding(
-                        padding: EdgeInsets.all(12),
-                        child: TextField(
-
-                        ),
-                      )
-                  )
-                ],
-              )
-          );
-        }
+    int idx = 0;
+    var listWidgets = paramsMap.keys.toList().map((key) {
+      int index = idx;
+      idx = idx + 1;
+      var key = paramsMap.keys.toList()[index];
+      var paramNameController =
+          controllerList[index][paramObj.paramNameController];
+      var paramValueController =
+          controllerList[index][paramObj.paramValueController];
+      paramNameController?.text = key;
+      var value = paramsMap![key];
+      if (value is String) {
+        paramValueController?.text = value;
+      }
+      return Form(
+          key: formKeyList[index],
+          child: Row(
+            children: [
+              Flexible(
+                  flex: 4,
+                  child: Padding(
+                    padding: EdgeInsets.all(12),
+                    child: TextFormField(
+                      validator: (value) {
+                        if (value is String && value.isNotEmpty) {
+                          return null;
+                        } else {
+                          return "参数名不能为空";
+                        }
+                      },
+                      controller: paramNameController,
+                      onChanged: (value) {
+                        var result =
+                            formKeyList[index].currentState?.validate();
+                        if (result is bool && result) {
+                          var newParamsMap = {...paramsMap};
+                          String prevValue = newParamsMap[key]!;
+                          newParamsMap.remove(key);
+                          newParamsMap[value] = prevValue;
+                          refreshData(newParamsMap);
+                        }
+                      },
+                    ),
+                  )),
+              Flexible(
+                  flex: 4,
+                  child: Padding(
+                    padding: EdgeInsets.all(12),
+                    child: TextFormField(
+                      controller: paramValueController,
+                      onChanged: (value) {
+                        var newParamsMap = {...paramsMap};
+                        newParamsMap[key] = value;
+                        refreshData(newParamsMap);
+                      },
+                    ),
+                  )),
+              Flexible(
+                  flex: 1,
+                  child: IconButton(
+                    icon: Icon(Icons.delete_outline),
+                    onPressed: () {
+                      var newParamsMap = {...paramsMap};
+                      newParamsMap.remove(key);
+                      refreshData(newParamsMap);
+                    },
+                  )),
+            ],
+          ));
+    });
+    return Column(
+      children: [
+        ...listWidgets,
+        IconButton(
+          icon: Icon(
+            Icons.add_box,
+            color: Colors.green,
+          ),
+          onPressed: () {
+            var newParamsMap = {...paramsMap};
+            newParamsMap.addEntries([MapEntry(getRandomString(8), "")]);
+            print(newParamsMap);
+            refreshData(newParamsMap);
+          },
+        )
+      ],
     );
   }
 }
