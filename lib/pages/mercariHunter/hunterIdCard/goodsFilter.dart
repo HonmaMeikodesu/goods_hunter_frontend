@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:goods_hunter/common/myError.dart';
 import 'package:goods_hunter/utils/generateRandomString.dart';
 import '../../../utils/const.dart';
 
@@ -209,7 +210,8 @@ class CustomFilter extends StatefulWidget {
 }
 
 class _CustomFilter extends State<CustomFilter> {
-  late Map<String, String> paramsMap;
+  late List<String> paramNameList;
+  late List<String> paramValueList;
   late List<Map<paramObj, TextEditingController>> controllerList;
   late List<GlobalKey<FormState>> formKeyList;
 
@@ -217,42 +219,69 @@ class _CustomFilter extends State<CustomFilter> {
   void initState() {
     super.initState();
     controllerList = [];
-    paramsMap = {};
     formKeyList = [];
-    refreshData(widget.paramsMap);
+    paramNameList = widget.paramsMap.keys.toList();
+    paramValueList = widget.paramsMap.values.toList();
+    paramNameList.forEach((key) {
+      controllerList.add({
+        paramObj.paramNameController: TextEditingController(),
+        paramObj.paramValueController: TextEditingController()
+      });
+      formKeyList.add(GlobalKey());
+    });
   }
 
-  refreshData(Map<String, String> newParamsMap) {
+  push() {
     setState(() {
-      paramsMap = newParamsMap;
-      paramsMap.keys.toList().forEach((key) {
-        controllerList.add({
-          paramObj.paramNameController: TextEditingController(),
-          paramObj.paramValueController: TextEditingController()
-        });
-        formKeyList.add(GlobalKey());
+      paramNameList.add(getRandomString(8));
+      paramValueList.add("");
+      controllerList.add({
+        paramObj.paramNameController: TextEditingController(),
+        paramObj.paramValueController: TextEditingController()
       });
+      formKeyList.add(GlobalKey());
+    });
+  }
+
+  change({ required int index, required String nextParamName, required String nextParamValue }) {
+    setState(() {
+      paramNameList[index] = nextParamName;
+      paramValueList[index] = nextParamValue;
+      controllerList[index][paramObj.paramNameController]?.text = nextParamName;
+      controllerList[index][paramObj.paramValueController]?.text = nextParamValue;
+    });
+  }
+
+  delete({ required int index }) {
+    setState(() {
+      paramValueList.removeAt(index);
+      paramValueList.removeAt(index);
+      controllerList.removeAt(index);
+      formKeyList.removeAt(index);
+      print(paramNameList);
+      print(paramValueList);
+      print(controllerList);
+      print(formKeyList);
+      print("___-----");
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    int idx = 0;
-    var listWidgets = paramsMap.keys.toList().map((key) {
-      int index = idx;
-      idx = idx + 1;
-      var key = paramsMap.keys.toList()[index];
-      var paramNameController =
-          controllerList[index][paramObj.paramNameController];
-      var paramValueController =
-          controllerList[index][paramObj.paramValueController];
+    List<Widget> listWidgets = [];
+    for (var i = 0; i < paramNameList.length; i++) {
+      print(paramNameList.length);
+      print(paramValueList.length);
+      print(controllerList.length);
+      print(formKeyList.length);
+      var key = paramNameList[i];
+      var value = paramValueList[i];
+      var paramNameController = controllerList[i][paramObj.paramNameController];
+      var paramValueController = controllerList[i][paramObj.paramValueController];
       paramNameController?.text = key;
-      var value = paramsMap![key];
-      if (value is String) {
-        paramValueController?.text = value;
-      }
-      return Form(
-          key: formKeyList[index],
+      paramValueController?.text = value;
+      listWidgets.add(Form(
+          key: formKeyList[i],
           child: Row(
             children: [
               Flexible(
@@ -268,15 +297,11 @@ class _CustomFilter extends State<CustomFilter> {
                         }
                       },
                       controller: paramNameController,
-                      onChanged: (value) {
+                      onChanged: (nextName) {
                         var result =
-                            formKeyList[index].currentState?.validate();
+                        formKeyList[i].currentState?.validate();
                         if (result is bool && result) {
-                          var newParamsMap = {...paramsMap};
-                          String prevValue = newParamsMap[key]!;
-                          newParamsMap.remove(key);
-                          newParamsMap[value] = prevValue;
-                          refreshData(newParamsMap);
+                          change(index: i, nextParamName: nextName, nextParamValue: paramValueList[i]);
                         }
                       },
                     ),
@@ -287,10 +312,8 @@ class _CustomFilter extends State<CustomFilter> {
                     padding: EdgeInsets.all(12),
                     child: TextFormField(
                       controller: paramValueController,
-                      onChanged: (value) {
-                        var newParamsMap = {...paramsMap};
-                        newParamsMap[key] = value;
-                        refreshData(newParamsMap);
+                      onChanged: (nextValue) {
+                        change(index: i, nextParamName: paramNameList[i], nextParamValue: nextValue);
                       },
                     ),
                   )),
@@ -299,14 +322,12 @@ class _CustomFilter extends State<CustomFilter> {
                   child: IconButton(
                     icon: Icon(Icons.delete_outline),
                     onPressed: () {
-                      var newParamsMap = {...paramsMap};
-                      newParamsMap.remove(key);
-                      refreshData(newParamsMap);
+                      delete(index: i);
                     },
                   )),
             ],
-          ));
-    });
+          )));
+    }
     return Column(
       children: [
         ...listWidgets,
@@ -316,10 +337,7 @@ class _CustomFilter extends State<CustomFilter> {
             color: Colors.green,
           ),
           onPressed: () {
-            var newParamsMap = {...paramsMap};
-            newParamsMap.addEntries([MapEntry(getRandomString(8), "")]);
-            print(newParamsMap);
-            refreshData(newParamsMap);
+            push();
           },
         )
       ],
