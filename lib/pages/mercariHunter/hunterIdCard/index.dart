@@ -34,6 +34,7 @@ class _HunterIdCardState extends State<HunterIdCard>
   late String? deliveryStatus;
   late String? minPrice;
   late String? maxPrice;
+  late Map<String, String> extraParamsMap;
 
   KeywordInputStatus keywordInputStatus = KeywordInputStatus.read;
 
@@ -49,6 +50,7 @@ class _HunterIdCardState extends State<HunterIdCard>
     deliveryStatus= uriObj["shipping_payer_id"];
     minPrice = uriObj["price_min"];
     maxPrice = uriObj["price_max"];
+    extraParamsMap = Map.fromEntries(uriObj.entries.toList().where((mapEntry) => ["keyword", "item_condition_id", "status", "shipping_payer_id", "price_min", "price_max"].every((element) => element != mapEntry.key)));
     widget.transitionAnimation!.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
         setState(() {
@@ -130,6 +132,12 @@ class _HunterIdCardState extends State<HunterIdCard>
                 PriceFilter(
                   minPrice: minPrice,
                   maxPrice: maxPrice,
+                  onChange: ({minPrice, maxPrice}) {
+                    setState(() {
+                      this.minPrice = minPrice;
+                      this.maxPrice = maxPrice;
+                    });
+                  },
                 )
               ],
             ),
@@ -139,7 +147,12 @@ class _HunterIdCardState extends State<HunterIdCard>
               trailing: Icon(Icons.developer_mode, color: Colors.grey,),
               controlAffinity: ListTileControlAffinity.leading,
               children: [
-                CustomFilter(paramsMap: {"asd": "qwe"})
+                CustomFilter(paramsMap: extraParamsMap, onChange: ({required paramsMap}) {
+                  print(paramsMap);
+                  setState(() {
+                    extraParamsMap = paramsMap;
+                  });
+                },)
               ],
             )
           ]),

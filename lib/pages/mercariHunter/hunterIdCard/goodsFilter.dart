@@ -107,40 +107,28 @@ class _StatusFilterState extends State<StatusFilter> {
 class PriceFilter extends StatefulWidget {
   final String? minPrice;
   final String? maxPrice;
+  final void Function({String? minPrice, String? maxPrice}) onChange;
 
-  const PriceFilter({Key? key, this.minPrice, this.maxPrice}) : super(key: key);
+  const PriceFilter({Key? key, this.minPrice, this.maxPrice, required this.onChange}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() => _PriceFilterState();
 }
 
 class _PriceFilterState extends State<PriceFilter> {
-  String? minPrice;
-
-  String? maxPrice;
 
   TextEditingController minController = TextEditingController();
 
   TextEditingController maxController = TextEditingController();
 
   @override
-  void initState() {
-    super.initState();
-    minPrice = widget.minPrice;
-    maxPrice = widget.maxPrice;
-  }
-
-  @override
   Widget build(BuildContext context) {
-    if (minPrice is String) {
-      minController.text = minPrice!;
-    } else {
-      minController.clear();
+
+    if (widget.minPrice is String) {
+      minController.text = widget.minPrice!;
     }
-    if (maxPrice is String) {
-      maxController.text = maxPrice!;
-    } else {
-      maxController.clear();
+    if (widget.maxPrice is String) {
+      maxController.text = widget.maxPrice!;
     }
     return Row(
       children: [
@@ -149,7 +137,11 @@ class _PriceFilterState extends State<PriceFilter> {
               padding: EdgeInsets.all(12),
               child: TextField(
                 onChanged: (value) {
-                  minPrice = value;
+                  String? nextMinPrice;
+                  if (value.isNotEmpty) {
+                    nextMinPrice = value;
+                  }
+                  widget.onChange(minPrice: nextMinPrice, maxPrice: widget.maxPrice);
                 },
                 textAlign: TextAlign.center,
                 textAlignVertical: TextAlignVertical.center,
@@ -174,7 +166,11 @@ class _PriceFilterState extends State<PriceFilter> {
               child: TextField(
                 textAlign: TextAlign.center,
                 onChanged: (value) {
-                  maxPrice = value;
+                  String? nextMaxPrice;
+                  if (value.isNotEmpty) {
+                    nextMaxPrice = value;
+                  }
+                  widget.onChange(minPrice: widget.minPrice, maxPrice: widget.maxPrice);
                 },
                 textAlignVertical: TextAlignVertical.center,
                 decoration: InputDecoration(
@@ -203,7 +199,9 @@ enum paramObj {
 class CustomFilter extends StatefulWidget {
   final Map<String, String> paramsMap;
 
-  const CustomFilter({Key? key, required this.paramsMap}) : super(key: key);
+  final void Function({required Map<String, String> paramsMap}) onChange;
+
+  const CustomFilter({Key? key, required this.paramsMap, required this.onChange}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() => _CustomFilter();
@@ -213,22 +211,28 @@ class _CustomFilter extends State<CustomFilter> {
   late List<String> paramNameList;
   late List<String> paramValueList;
   late List<Map<paramObj, TextEditingController>> controllerList;
-  late List<GlobalKey<FormState>> formKeyList;
 
   @override
   void initState() {
     super.initState();
+    resetData();
+  }
+
+  didUpdateWidget(oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    resetData();
+  }
+
+  resetData() {
     controllerList = [];
-    formKeyList = [];
     paramNameList = widget.paramsMap.keys.toList();
     paramValueList = widget.paramsMap.values.toList();
-    paramNameList.forEach((key) {
+    for (var key in paramNameList) {
       controllerList.add({
         paramObj.paramNameController: TextEditingController(),
         paramObj.paramValueController: TextEditingController()
       });
-      formKeyList.add(GlobalKey());
-    });
+    }
   }
 
   push() {
@@ -239,30 +243,24 @@ class _CustomFilter extends State<CustomFilter> {
         paramObj.paramNameController: TextEditingController(),
         paramObj.paramValueController: TextEditingController()
       });
-      formKeyList.add(GlobalKey());
     });
   }
 
-  change({ required int index, required String nextParamName, required String nextParamValue }) {
+  change(
+      {required int index,
+      required String nextParamName,
+      required String nextParamValue}) {
     setState(() {
       paramNameList[index] = nextParamName;
       paramValueList[index] = nextParamValue;
-      controllerList[index][paramObj.paramNameController]?.text = nextParamName;
-      controllerList[index][paramObj.paramValueController]?.text = nextParamValue;
     });
   }
 
-  delete({ required int index }) {
+  delete({required int index}) {
     setState(() {
-      paramValueList.removeAt(index);
+      paramNameList.removeAt(index);
       paramValueList.removeAt(index);
       controllerList.removeAt(index);
-      formKeyList.removeAt(index);
-      print(paramNameList);
-      print(paramValueList);
-      print(controllerList);
-      print(formKeyList);
-      print("___-----");
     });
   }
 
@@ -270,67 +268,119 @@ class _CustomFilter extends State<CustomFilter> {
   Widget build(BuildContext context) {
     List<Widget> listWidgets = [];
     for (var i = 0; i < paramNameList.length; i++) {
-      print(paramNameList.length);
-      print(paramValueList.length);
-      print(controllerList.length);
-      print(formKeyList.length);
       var key = paramNameList[i];
       var value = paramValueList[i];
       var paramNameController = controllerList[i][paramObj.paramNameController];
-      var paramValueController = controllerList[i][paramObj.paramValueController];
+      var paramValueController =
+          controllerList[i][paramObj.paramValueController];
       paramNameController?.text = key;
       paramValueController?.text = value;
-      listWidgets.add(Form(
-          key: formKeyList[i],
-          child: Row(
-            children: [
-              Flexible(
-                  flex: 4,
-                  child: Padding(
-                    padding: EdgeInsets.all(12),
-                    child: TextFormField(
-                      validator: (value) {
-                        if (value is String && value.isNotEmpty) {
-                          return null;
-                        } else {
-                          return "参数名不能为空";
-                        }
-                      },
-                      controller: paramNameController,
-                      onChanged: (nextName) {
-                        var result =
-                        formKeyList[i].currentState?.validate();
-                        if (result is bool && result) {
-                          change(index: i, nextParamName: nextName, nextParamValue: paramValueList[i]);
-                        }
-                      },
-                    ),
-                  )),
-              Flexible(
-                  flex: 4,
-                  child: Padding(
-                    padding: EdgeInsets.all(12),
-                    child: TextFormField(
-                      controller: paramValueController,
-                      onChanged: (nextValue) {
-                        change(index: i, nextParamName: paramNameList[i], nextParamValue: nextValue);
-                      },
-                    ),
-                  )),
-              Flexible(
-                  flex: 1,
-                  child: IconButton(
-                    icon: Icon(Icons.delete_outline),
-                    onPressed: () {
-                      delete(index: i);
+      listWidgets.add(Row(
+        children: [
+          Flexible(
+              flex: 4,
+              child: Builder(builder: (context) {
+                return Padding(
+                  padding: EdgeInsets.all(12),
+                  child: TextFormField(
+                    controller:  paramNameController,
+                    validator: (value) {
+                      if (value is String && value.isNotEmpty) {
+                        return null;
+                      } else {
+                        return "参数名不能为空";
+                      }
                     },
-                  )),
-            ],
-          )));
+                    // controller: paramNameController,
+                    onChanged: (nextName) {
+                      var result = Form.of(context)?.validate();
+                      if (result is bool && result) {
+                        change(
+                            index: i,
+                            nextParamName: nextName,
+                            nextParamValue: paramValueList[i]);
+                      }
+                    },
+                  ),
+                );
+              },)
+          ),
+          Flexible(
+              flex: 4,
+              child: Padding(
+                padding: EdgeInsets.all(12),
+                child: TextFormField(
+                  controller: paramValueController,
+                  // controller: paramValueController,
+                  onChanged: (nextValue) {
+                    change(
+                        index: i,
+                        nextParamName: paramNameList[i],
+                        nextParamValue: nextValue);
+                  },
+                ),
+              )),
+          Flexible(
+              flex: 1,
+              child: IconButton(
+                icon: Icon(Icons.delete_outline),
+                onPressed: () {
+                  delete(index: i);
+                },
+              )),
+        ],
+      ));
     }
     return Column(
       children: [
-        ...listWidgets,
+        Row(
+          children: [
+            Expanded(
+                flex: 4,
+                child: Padding(
+                  padding: EdgeInsets.all(12),
+                  child: Align(
+                    alignment: Alignment.center,
+                    child: Text(
+                        "参数名",
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 24,
+                        )
+                    ),
+                  ),
+                )),
+            Expanded(
+                flex: 4,
+                child: Padding(
+                  padding: EdgeInsets.all(12),
+                  child: Align(
+                    alignment: Alignment.center,
+                    child: Text(
+                        "参数值",
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 24,
+                        )
+                    ),
+                  ),
+                )),
+            Flexible(
+                flex: 1,
+                child: IconButton(
+                  icon: Icon(
+                    Icons.delete_outline,
+                    color: Colors.transparent,
+                  ),
+                  onPressed: () {},
+                )),
+          ],
+        ),
+        Form(
+          child: Column(
+            children: listWidgets,
+          ),
+        ),
         IconButton(
           icon: Icon(
             Icons.add_box,
