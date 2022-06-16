@@ -36,6 +36,8 @@ class _HunterIdCardState extends State<HunterIdCard>
   late String? maxPrice;
   late Map<String, String> extraParamsMap;
 
+  bool resetExtraParams = false;
+
   KeywordInputStatus keywordInputStatus = KeywordInputStatus.read;
 
   @override
@@ -148,11 +150,13 @@ class _HunterIdCardState extends State<HunterIdCard>
               controlAffinity: ListTileControlAffinity.leading,
               children: [
                 CustomFilter(paramsMap: extraParamsMap, onChange: ({required paramsMap}) {
-                  print(paramsMap);
+                  print("hahaha");
                   setState(() {
                     extraParamsMap = paramsMap;
                   });
-                },)
+                }, resetComplete: () {
+                  resetExtraParams = false;
+                }, needReset: resetExtraParams,)
               ],
             )
           ]),

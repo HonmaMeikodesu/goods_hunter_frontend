@@ -207,9 +207,11 @@ class CustomFilter extends StatefulWidget {
 
   final void Function({required Map<String, String> paramsMap}) onChange;
 
-  const CustomFilter(
-      {Key? key, required this.paramsMap, required this.onChange})
-      : super(key: key);
+  final void Function() resetComplete;
+
+  final bool needReset;
+
+  const CustomFilter({Key? key, required this.paramsMap, required this.onChange, required this.resetComplete, required this.needReset}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() => _CustomFilter();
@@ -226,9 +228,13 @@ class _CustomFilter extends State<CustomFilter> {
     resetData();
   }
 
+  @override
   didUpdateWidget(oldWidget) {
     super.didUpdateWidget(oldWidget);
-    resetData();
+    if (widget.needReset) {
+      resetData();
+      widget.resetComplete();
+    }
   }
 
   resetData() {
@@ -243,6 +249,16 @@ class _CustomFilter extends State<CustomFilter> {
     }
   }
 
+  get paramsMap {
+    Map<String, String> _map = {};
+    List<MapEntry<String, String>> _mapEntrys = [];
+    for (int i = 0; i < paramNameList.length; i++) {
+      _mapEntrys.add(MapEntry(paramNameList[i], paramValueList[i]));
+    }
+    _map.addEntries(_mapEntrys);
+    return _map;
+  }
+
   push() {
     setState(() {
       paramNameList.add(getRandomString(8));
@@ -251,6 +267,7 @@ class _CustomFilter extends State<CustomFilter> {
         paramObj.paramNameController: TextEditingController(),
         paramObj.paramValueController: TextEditingController()
       });
+      widget.onChange(paramsMap: paramsMap);
     });
   }
 
@@ -261,6 +278,7 @@ class _CustomFilter extends State<CustomFilter> {
     setState(() {
       paramNameList[index] = nextParamName;
       paramValueList[index] = nextParamValue;
+      widget.onChange(paramsMap: paramsMap);
     });
   }
 
@@ -269,6 +287,7 @@ class _CustomFilter extends State<CustomFilter> {
       paramNameList.removeAt(index);
       paramValueList.removeAt(index);
       controllerList.removeAt(index);
+      widget.onChange(paramsMap: paramsMap);
     });
   }
 
@@ -281,8 +300,12 @@ class _CustomFilter extends State<CustomFilter> {
       var paramNameController = controllerList[i][paramObj.paramNameController];
       var paramValueController =
           controllerList[i][paramObj.paramValueController];
+      var nameCurrentOffset = paramNameController!.selection.base.offset;
+      var valueCurrentOffset = paramValueController!.selection.base.offset;
       paramNameController?.text = key;
+      paramNameController?.selection = TextSelection.collapsed(offset: nameCurrentOffset);
       paramValueController?.text = value;
+      paramValueController.selection = TextSelection.collapsed(offset: valueCurrentOffset);
       listWidgets.add(Row(
         children: [
           Flexible(
