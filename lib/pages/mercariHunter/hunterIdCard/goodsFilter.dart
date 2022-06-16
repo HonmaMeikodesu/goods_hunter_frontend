@@ -109,26 +109,30 @@ class PriceFilter extends StatefulWidget {
   final String? maxPrice;
   final void Function({String? minPrice, String? maxPrice}) onChange;
 
-  const PriceFilter({Key? key, this.minPrice, this.maxPrice, required this.onChange}) : super(key: key);
+  const PriceFilter(
+      {Key? key, this.minPrice, this.maxPrice, required this.onChange})
+      : super(key: key);
 
   @override
   State<StatefulWidget> createState() => _PriceFilterState();
 }
 
 class _PriceFilterState extends State<PriceFilter> {
-
   TextEditingController minController = TextEditingController();
 
   TextEditingController maxController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
-
     if (widget.minPrice is String) {
+      var currentOffset = minController.selection.base.offset;
       minController.text = widget.minPrice!;
+      minController.selection = TextSelection.collapsed(offset: currentOffset);
     }
     if (widget.maxPrice is String) {
+      var currentOffset = maxController.selection.base.offset;
       maxController.text = widget.maxPrice!;
+      maxController.selection = TextSelection.collapsed(offset: currentOffset);
     }
     return Row(
       children: [
@@ -141,7 +145,8 @@ class _PriceFilterState extends State<PriceFilter> {
                   if (value.isNotEmpty) {
                     nextMinPrice = value;
                   }
-                  widget.onChange(minPrice: nextMinPrice, maxPrice: widget.maxPrice);
+                  widget.onChange(
+                      minPrice: nextMinPrice, maxPrice: widget.maxPrice);
                 },
                 textAlign: TextAlign.center,
                 textAlignVertical: TextAlignVertical.center,
@@ -170,7 +175,8 @@ class _PriceFilterState extends State<PriceFilter> {
                   if (value.isNotEmpty) {
                     nextMaxPrice = value;
                   }
-                  widget.onChange(minPrice: widget.minPrice, maxPrice: widget.maxPrice);
+                  widget.onChange(
+                      minPrice: widget.minPrice, maxPrice: widget.maxPrice);
                 },
                 textAlignVertical: TextAlignVertical.center,
                 decoration: InputDecoration(
@@ -201,7 +207,9 @@ class CustomFilter extends StatefulWidget {
 
   final void Function({required Map<String, String> paramsMap}) onChange;
 
-  const CustomFilter({Key? key, required this.paramsMap, required this.onChange}) : super(key: key);
+  const CustomFilter(
+      {Key? key, required this.paramsMap, required this.onChange})
+      : super(key: key);
 
   @override
   State<StatefulWidget> createState() => _CustomFilter();
@@ -279,32 +287,33 @@ class _CustomFilter extends State<CustomFilter> {
         children: [
           Flexible(
               flex: 4,
-              child: Builder(builder: (context) {
-                return Padding(
-                  padding: EdgeInsets.all(12),
-                  child: TextFormField(
-                    controller:  paramNameController,
-                    validator: (value) {
-                      if (value is String && value.isNotEmpty) {
-                        return null;
-                      } else {
-                        return "参数名不能为空";
-                      }
-                    },
-                    // controller: paramNameController,
-                    onChanged: (nextName) {
-                      var result = Form.of(context)?.validate();
-                      if (result is bool && result) {
-                        change(
-                            index: i,
-                            nextParamName: nextName,
-                            nextParamValue: paramValueList[i]);
-                      }
-                    },
-                  ),
-                );
-              },)
-          ),
+              child: Builder(
+                builder: (context) {
+                  return Padding(
+                    padding: EdgeInsets.all(12),
+                    child: TextFormField(
+                      controller: paramNameController,
+                      validator: (value) {
+                        if (value is String && value.isNotEmpty) {
+                          return null;
+                        } else {
+                          return "参数名不能为空";
+                        }
+                      },
+                      // controller: paramNameController,
+                      onChanged: (nextName) {
+                        var result = Form.of(context)?.validate();
+                        if (result is bool && result) {
+                          change(
+                              index: i,
+                              nextParamName: nextName,
+                              nextParamValue: paramValueList[i]);
+                        }
+                      },
+                    ),
+                  );
+                },
+              )),
           Flexible(
               flex: 4,
               child: Padding(
@@ -341,13 +350,11 @@ class _CustomFilter extends State<CustomFilter> {
                   padding: EdgeInsets.all(12),
                   child: Align(
                     alignment: Alignment.center,
-                    child: Text(
-                        "参数名",
+                    child: Text("参数名",
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 24,
-                        )
-                    ),
+                        )),
                   ),
                 )),
             Expanded(
@@ -356,13 +363,11 @@ class _CustomFilter extends State<CustomFilter> {
                   padding: EdgeInsets.all(12),
                   child: Align(
                     alignment: Alignment.center,
-                    child: Text(
-                        "参数值",
+                    child: Text("参数值",
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 24,
-                        )
-                    ),
+                        )),
                   ),
                 )),
             Flexible(
