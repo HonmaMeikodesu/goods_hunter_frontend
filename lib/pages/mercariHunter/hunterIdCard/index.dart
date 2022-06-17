@@ -150,7 +150,6 @@ class _HunterIdCardState extends State<HunterIdCard>
               controlAffinity: ListTileControlAffinity.leading,
               children: [
                 CustomFilter(paramsMap: extraParamsMap, onChange: ({required paramsMap}) {
-                  print("hahaha");
                   setState(() {
                     extraParamsMap = paramsMap;
                   });
@@ -288,7 +287,47 @@ class _HunterIdCardState extends State<HunterIdCard>
                 },
                 child: Text("保存"),
               ),
-              Padding(padding: EdgeInsets.only(left: 24)),
+              Padding(padding: EdgeInsets.only(left: 24, right: 24, top: 8, bottom: 8),
+              child: FloatingActionButton.extended(
+                onPressed: () {
+                  showDialog(context: context, builder: (context) {
+                    return AlertDialog(
+                      title: Row(
+                        children: [
+                          Text("请输入煤炉链接地址"),
+                          Padding(padding: EdgeInsets.only(left: 12)),
+                          Tooltip(
+                            child: Icon(Icons.help_outline, color: Colors.lightGreen),
+                            richMessage: TextSpan(
+                              children: [
+                                TextSpan(text: "例如:"),
+                                TextSpan(text: "https://jp.mercari.com/search?keyword=anohana", style: TextStyle(fontFamily: "caveat"))
+                              ]
+                            ),
+                            waitDuration: Duration(seconds: 0),
+                          )
+                        ],
+                      ),
+                      content: TextField(
+                        onChanged: (value) {
+                        },
+                      ),
+                      actions: [
+                        TextButton(onPressed: () {
+
+                        }, child: Text("确认")),
+                        TextButton(onPressed: () {
+
+                        }, child: Text("取消"))
+                      ],
+                    );
+                  });
+                },
+                label: Text("导入配置"),
+                icon: Icon(Icons.upload_rounded),
+                backgroundColor: Colors.pink,
+
+              ),),
               OutlinedButton(
                 onPressed: () {
                   Navigator.of(context).pop();

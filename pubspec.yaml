@@ -99,3 +99,7 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
+  fonts:
+    - family: caveat
+      fonts:
+        - asset: assets/fonts/Caveat-Regular.ttf
