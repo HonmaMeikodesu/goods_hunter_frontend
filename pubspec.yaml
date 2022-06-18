@@ -40,6 +40,8 @@ dependencies:
   path_provider: ^2.0.8
   cookie_jar: ^3.0.1
   email_validator: ^2.0.1
+  cron_form_field: ^0.4.0
+  flutter_switch: ^0.3.2
 
 dev_dependencies:
   flutter_test:

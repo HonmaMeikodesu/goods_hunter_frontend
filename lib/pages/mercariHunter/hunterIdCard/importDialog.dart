@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 class ImportDialog extends StatefulWidget {
   final void Function(String url) onOk;
 
-  ImportDialog({Key? key, required this.onOk}) : super(key: key);
+  const ImportDialog({Key? key, required this.onOk, this.previousUrl}) : super(key: key);
+
+  final String? previousUrl;
 
   @override
   State<StatefulWidget> createState() => _ImportDialogState();
@@ -13,12 +15,24 @@ class _ImportDialogState extends State<ImportDialog> {
 
   bool urlValid = false;
 
+  TextEditingController textFieldController = TextEditingController();
+
+  initState() {
+    super.initState();
+    if (widget.previousUrl is String) {
+      url = widget.previousUrl!;
+      urlValid = true;
+      textFieldController.text = url;
+      textFieldController.selection = TextSelection(baseOffset: 0, extentOffset: url.length);
+    }
+  }
+
   late String url;
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
       title: Row(
-        children: [
+        children: const [
           Text("请输入煤炉链接地址"),
           Padding(padding: EdgeInsets.only(left: 12)),
           Tooltip(
@@ -37,6 +51,8 @@ class _ImportDialogState extends State<ImportDialog> {
       content: Form(
         child: Builder(builder: (context) {
           return TextFormField(
+            autofocus: true,
+            controller: textFieldController,
             onChanged: (value) {
               Form.of(context)?.validate();
               setState(() {

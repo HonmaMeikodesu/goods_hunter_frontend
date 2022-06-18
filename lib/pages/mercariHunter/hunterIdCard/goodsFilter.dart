@@ -176,7 +176,7 @@ class _PriceFilterState extends State<PriceFilter> {
                     nextMaxPrice = value;
                   }
                   widget.onChange(
-                      minPrice: widget.minPrice, maxPrice: widget.maxPrice);
+                      minPrice: widget.minPrice, maxPrice: nextMaxPrice);
                 },
                 textAlignVertical: TextAlignVertical.center,
                 decoration: InputDecoration(
