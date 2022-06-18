@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:goods_hunter/pages/mercariHunter/hunterIdCard/ghost.dart';
 import 'package:goods_hunter/pages/mercariHunter/hunterIdCard/goodsFilter.dart';
+import 'package:goods_hunter/pages/mercariHunter/hunterIdCard/importDialog.dart';
 import 'package:goods_hunter/utils/const.dart';
 import '../../../models/index.dart' as model;
 import "dart:math" as math;
@@ -12,7 +13,7 @@ class HunterIdCard extends StatefulWidget {
   final RelativeRect? transitionRect;
   final Animation<double>? transitionAnimation;
 
-  HunterIdCard({Key? key, required this.hunterInfo, this.transitionAnimation, this.transitionRect }) : super(key: key);
+  const HunterIdCard({Key? key, required this.hunterInfo, this.transitionAnimation, this.transitionRect }) : super(key: key);
 
   @override
   State<StatefulWidget> createState() => _HunterIdCardState();
@@ -154,6 +155,7 @@ class _HunterIdCardState extends State<HunterIdCard>
                     extraParamsMap = paramsMap;
                   });
                 }, resetComplete: () {
+                  // no need to pick this update up immediately
                   resetExtraParams = false;
                 }, needReset: resetExtraParams,)
               ],
@@ -291,36 +293,19 @@ class _HunterIdCardState extends State<HunterIdCard>
               child: FloatingActionButton.extended(
                 onPressed: () {
                   showDialog(context: context, builder: (context) {
-                    return AlertDialog(
-                      title: Row(
-                        children: [
-                          Text("请输入煤炉链接地址"),
-                          Padding(padding: EdgeInsets.only(left: 12)),
-                          Tooltip(
-                            child: Icon(Icons.help_outline, color: Colors.lightGreen),
-                            richMessage: TextSpan(
-                              children: [
-                                TextSpan(text: "例如:"),
-                                TextSpan(text: "https://jp.mercari.com/search?keyword=anohana", style: TextStyle(fontFamily: "caveat"))
-                              ]
-                            ),
-                            waitDuration: Duration(seconds: 0),
-                          )
-                        ],
-                      ),
-                      content: TextField(
-                        onChanged: (value) {
-                        },
-                      ),
-                      actions: [
-                        TextButton(onPressed: () {
-
-                        }, child: Text("确认")),
-                        TextButton(onPressed: () {
-
-                        }, child: Text("取消"))
-                      ],
-                    );
+                    return ImportDialog(onOk: (newUrl) {
+                      setState(() {
+                        var uriObj = Uri.parse(newUrl).queryParameters;
+                        keyword = uriObj["keyword"] ?? "";
+                        goodsStatus = uriObj["item_condition_id"];
+                        salesStatus = uriObj["status"];
+                        deliveryStatus= uriObj["shipping_payer_id"];
+                        minPrice = uriObj["price_min"];
+                        maxPrice = uriObj["price_max"];
+                        extraParamsMap = Map.fromEntries(uriObj.entries.toList().where((mapEntry) => ["keyword", "item_condition_id", "status", "shipping_payer_id", "price_min", "price_max"].every((element) => element != mapEntry.key)));
+                        resetExtraParams = true;
+                      });
+                    });
                   });
                 },
                 label: Text("导入配置"),
