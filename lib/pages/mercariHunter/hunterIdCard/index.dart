@@ -15,10 +15,12 @@ class HunterIdCard extends StatefulWidget {
 
   final RelativeRect? transitionRect;
   final Animation<double>? transitionAnimation;
+  final String savePurpose;
 
   const HunterIdCard(
       {Key? key,
       required this.hunterInfo,
+        required this.savePurpose,
       this.transitionAnimation,
       this.transitionRect})
       : super(key: key);
@@ -65,7 +67,10 @@ class _HunterIdCardState extends State<HunterIdCard>
     pendingForTransition = widget.transitionAnimation is Animation<double> &&
         widget.transitionRect is RelativeRect;
 
-    var uriObj = Uri.parse(widget.hunterInfo.url).queryParameters;
+    Map<String, String> uriObj = {};
+    if (widget.hunterInfo.url is String) {
+      uriObj = Uri.parse(widget.hunterInfo.url!).queryParameters;
+    }
     keyword = uriObj["keyword"] ?? "";
     goodsStatus = uriObj["item_condition_id"];
     salesStatus = uriObj["status"];
@@ -82,7 +87,7 @@ class _HunterIdCardState extends State<HunterIdCard>
               "price_max"
             ].every((element) => element != mapEntry.key)));
 
-    widget.transitionAnimation!.addStatusListener((status) {
+    widget.transitionAnimation?.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
         setState(() {
           pendingForTransition = false;
@@ -94,13 +99,15 @@ class _HunterIdCardState extends State<HunterIdCard>
       }
     });
 
-    cronExpressionController.text = widget.hunterInfo.schedule;
+    if (widget.hunterInfo.schedule is String) {
+      cronExpressionController.text = widget.hunterInfo.schedule!;
+    }
 
-    if (widget.hunterInfo.freezingStart.isNotEmpty &&
-        widget.hunterInfo.freezingEnd.isNotEmpty) {
+    if (widget.hunterInfo.freezingStart is String &&
+        widget.hunterInfo.freezingEnd is String) {
       useFreezing = true;
-      freezingStart = "${widget.hunterInfo.freezingStart.split(":")[0]}:${widget.hunterInfo.freezingStart.split(":")[1]}";
-      freezingEnd = "${widget.hunterInfo.freezingEnd.split(":")[0]}:${widget.hunterInfo.freezingEnd.split(":")[1]}";
+      freezingStart = "${widget.hunterInfo.freezingStart!.split(":")[0]}:${widget.hunterInfo.freezingStart!.split(":")[1]}";
+      freezingEnd = "${widget.hunterInfo.freezingEnd!.split(":")[0]}:${widget.hunterInfo.freezingEnd!.split(":")[1]}";
     }
   }
 
@@ -570,17 +577,28 @@ class _HunterIdCardState extends State<HunterIdCard>
         children: [
           ElevatedButton(
             onPressed: () async {
-              var hunterInfoToUpload = MercariHunterInfoToUpload.from(
-                  id: widget.hunterInfo.hunterInstanceId,
-                  url: buildHunterUrl("api.mercari.jp", "search_index/search").toString(),
-                  schedule: cronExpressionController.text,
-                  freezeEnd: freezingEnd,
-                  freezeStart: freezingStart
-              );
-              await updateMercariHunterWatcherInfo(context: context, hunterInfoToRegister: hunterInfoToUpload);
-              Future.delayed(Duration(milliseconds: 500), () {
-                Navigator.of(context).pop();
-              });
+              var freezingEnd = useFreezing ? this.freezingEnd : null;
+              var freezingStart = useFreezing ? this.freezingStart : null;
+              if (keyword is String && keyword!.isNotEmpty && cronExpressionController.text.isNotEmpty) {
+                var hunterInfoToUpload = MercariHunterInfoToUpload.from(
+                    id: widget.hunterInfo.hunterInstanceId,
+                    url: buildHunterUrl("api.mercari.jp", "search_index/search").toString(),
+                    schedule: cronExpressionController.text,
+                    freezeEnd: freezingEnd,
+                    freezeStart: freezingStart
+                );
+                if (widget.savePurpose == "create") {
+                  await registerMercariHunterWatcherInfo(
+                      context: context,
+                      hunterInfoToRegister: hunterInfoToUpload
+                  );
+                } else if (widget.savePurpose == "update" && widget.hunterInfo.hunterInstanceId is String) {
+                  await updateMercariHunterWatcherInfo(context: context, hunterInfoToRegister: hunterInfoToUpload);
+                }
+                Future.delayed(Duration(milliseconds: 500), () {
+                  Navigator.of(context).pop();
+                });
+              }
             },
             child: const Text("保存"),
           ),

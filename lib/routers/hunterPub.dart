@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:goods_hunter/pages/mercariHunter/hunterIdCard/index.dart';
 import 'dart:math' as math;
 
 import 'package:goods_hunter/pages/mercariHunter/index.dart';
+
+import '../models/index.dart' as model;
 
 class HunterPubRoute extends StatefulWidget {
   const HunterPubRoute({Key? key}) : super(key: key);
@@ -64,6 +67,26 @@ class _HunterPubRouteState extends State with TickerProviderStateMixin {
     );
     curvedAnimation = CurvedAnimation(parent: animationController, curve: Curves.easeOut);
     tabController = TabController(length: 4, vsync: this);
+  }
+
+  hireNewMercariHunter() {
+    Navigator.of(context).push(
+        PageRouteBuilder(
+            pageBuilder: (ctx, animation, secondAnimation) {
+              return HunterIdCard(
+                savePurpose: "create",
+                hunterInfo: model.MercariHunter.fromJson({}),
+              );
+            },
+            transitionDuration: Duration(milliseconds: 800),
+            reverseTransitionDuration: Duration(milliseconds: 500),
+            transitionsBuilder: (ctx, animation, secondAnimation, child) {
+              return FadeTransition (
+                  opacity: animation,
+                  child: child);
+            }
+        )
+    );
   }
 
   @override
@@ -154,7 +177,11 @@ class _HunterPubRouteState extends State with TickerProviderStateMixin {
                 ]),
             floatingActionButton: FloatingActionButton(
               tooltip: 'todo',
-              onPressed: () {},
+              onPressed: () {
+                if (currentSelectedTab == "mercari") {
+                  hireNewMercariHunter();
+                }
+              },
               child: const Icon(Icons.add),
             ),
           );

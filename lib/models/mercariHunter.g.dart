@@ -8,14 +8,14 @@ part of 'mercariHunter.dart';
 
 MercariHunter _$MercariHunterFromJson(Map<String, dynamic> json) =>
     MercariHunter()
-      ..hunterInstanceId = json['hunterInstanceId'] as String
+      ..hunterInstanceId = json['hunterInstanceId'] as String?
       ..lastShotAt = json['lastShotAt']
-      ..freezingStart = json['freezingStart'] as String
-      ..freezingEnd = json['freezingEnd'] as String
-      ..schedule = json['schedule'] as String
-      ..url = json['url'] as String
-      ..createdAt = json['createdAt'] as String
-      ..updatedAt = json['updatedAt'] as String;
+      ..freezingStart = json['freezingStart'] as String?
+      ..freezingEnd = json['freezingEnd'] as String?
+      ..schedule = json['schedule'] as String?
+      ..url = json['url'] as String?
+      ..createdAt = json['createdAt'] as String?
+      ..updatedAt = json['updatedAt'] as String?;
 
 Map<String, dynamic> _$MercariHunterToJson(MercariHunter instance) =>
     <String, dynamic>{

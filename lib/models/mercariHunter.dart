@@ -6,14 +6,14 @@ part 'mercariHunter.g.dart';
 class MercariHunter {
   MercariHunter();
 
-  late String hunterInstanceId;
+  late String? hunterInstanceId;
   late String? lastShotAt;
-  late String freezingStart;
-  late String freezingEnd;
-  late String schedule;
-  late String url;
-  late String createdAt;
-  late String updatedAt;
+  late String? freezingStart;
+  late String? freezingEnd;
+  late String? schedule;
+  late String? url;
+  late String? createdAt;
+  late String? updatedAt;
   
   factory MercariHunter.fromJson(Map<String,dynamic> json) => _$MercariHunterFromJson(json);
   Map<String, dynamic> toJson() => _$MercariHunterToJson(this);

@@ -17,7 +17,7 @@ class HunterList extends StatefulWidget {
 class _HunterListState extends State<HunterList> {
   @override
   Widget build(BuildContext context) {
-    List<Widget> listItems = widget.mercariHunterList.map((hunter) => HunterListItem(key: Key(hunter.hunterInstanceId), hunter: hunter ,onDeleteHunter: widget.onDeleteHunter)).toList();
+    List<Widget> listItems = widget.mercariHunterList.map((hunter) => HunterListItem(key: Key(hunter.hunterInstanceId!), hunter: hunter ,onDeleteHunter: widget.onDeleteHunter)).toList();
     return ListView.builder(
       itemCount: listItems.length,
       itemBuilder: (BuildContext context, int index) {

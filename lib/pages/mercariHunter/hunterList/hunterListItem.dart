@@ -27,7 +27,7 @@ class _HunterListItemState extends State<HunterListItem> {
   @override
   Widget build(BuildContext context) {
     models.MercariHunter hunter = widget.hunter;
-    String keyword = Uri.parse(hunter.url).queryParameters["keyword"] ?? "";
+    String keyword = Uri.parse(hunter.url!).queryParameters["keyword"] ?? "";
 
     return (
         GestureDetector(
@@ -94,7 +94,7 @@ class _HunterListItemState extends State<HunterListItem> {
                             IconButton(
                                 color: Colors.redAccent,
                                 onPressed: () {
-                                  widget.onDeleteHunter(hunter.hunterInstanceId);
+                                  widget.onDeleteHunter(hunter.hunterInstanceId!);
                                 },
                                 icon: Icon(Icons.delete_forever)
                             ),
@@ -109,7 +109,7 @@ class _HunterListItemState extends State<HunterListItem> {
                             keyword: keyword,
                             lastUpdatedAt: hunter.lastShotAt,
                             status: HunterStatus.hunting,
-                            schedule: hunter.schedule,
+                            schedule: hunter.schedule!,
                             onCheckHunterIdCard: () {
                               RenderBox box = context?.findRenderObject() as RenderBox;
                               Offset globalPos = box.localToGlobal(Offset.zero);
@@ -119,6 +119,7 @@ class _HunterListItemState extends State<HunterListItem> {
                                       pageBuilder: (ctx, animation, secondAnimation) {
                                         return HunterIdCard(
                                             hunterInfo: hunter,
+                                            savePurpose: "update",
                                             transitionAnimation: animation,
                                             transitionRect: RelativeRect.fromLTRB(globalPos.dx, globalPos.dy, screenSize.width - globalPos.dx - box.size.width, screenSize.height - globalPos.dy - box.size.height),
                                         );
