@@ -38,3 +38,39 @@ Future<void> deleteMercariHunterApi({required BuildContext context, required Str
     showToast(context: context, content: "删除成功", type: toastType.success, closeAfter: 2);
   });
 }
+
+class MercariHunterInfoToUpload {
+  final String? id;
+  final String url;
+  final String schedule;
+  final String? freezeStart;
+  final String? freezeEnd;
+  MercariHunterInfoToUpload.from({required this.url, required this.schedule, this.freezeEnd, this.freezeStart, this.id});
+}
+
+Future<void> registerMercariHunterWatcherInfo({required BuildContext context, required MercariHunterInfoToUpload hunterInfoToRegister}) {
+  return Request.fetch("/goods/registerGoodsWatcher",
+      options: Options(method: "POST"),
+      data: {
+        "url": hunterInfoToRegister.url,
+        "schedule": hunterInfoToRegister.schedule,
+        "freezeStart": hunterInfoToRegister.freezeStart,
+        "freezeEnd": hunterInfoToRegister.freezeEnd,
+      }, context: context).then((value) {
+    showToast(context: context, content: "新增成功", type: toastType.success, closeAfter: 2);
+  });
+}
+
+Future<void> updateMercariHunterWatcherInfo({required BuildContext context, required MercariHunterInfoToUpload hunterInfoToRegister}) {
+  return Request.fetch("/goods/updateGoodsWatcher",
+      options: Options(method: "POST"),
+      data: {
+        "id": hunterInfoToRegister.id,
+        "url": hunterInfoToRegister.url,
+        "schedule": hunterInfoToRegister.schedule,
+        "freezeStart": hunterInfoToRegister.freezeStart,
+        "freezeEnd": hunterInfoToRegister.freezeEnd,
+      }, context: context).then((value) {
+    showToast(context: context, content: "更新成功", type: toastType.success, closeAfter: 2);
+  });
+}
