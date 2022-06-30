@@ -76,6 +76,7 @@ class _HunterPubRouteState extends State with TickerProviderStateMixin {
               return HunterIdCard(
                 savePurpose: "create",
                 hunterInfo: model.MercariHunter.fromJson({}),
+                autoFocusOnKeywordEdit: true,
               );
             },
             transitionDuration: Duration(milliseconds: 800),

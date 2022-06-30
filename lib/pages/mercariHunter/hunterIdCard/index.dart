@@ -16,13 +16,16 @@ class HunterIdCard extends StatefulWidget {
   final RelativeRect? transitionRect;
   final Animation<double>? transitionAnimation;
   final String savePurpose;
+  final bool? autoFocusOnKeywordEdit;
 
   const HunterIdCard(
       {Key? key,
       required this.hunterInfo,
-        required this.savePurpose,
+      required this.savePurpose,
       this.transitionAnimation,
-      this.transitionRect})
+      this.transitionRect,
+      this.autoFocusOnKeywordEdit
+      })
       : super(key: key);
 
   @override
@@ -54,11 +57,14 @@ class _HunterIdCardState extends State<HunterIdCard>
 
   bool resetExtraParams = false;
 
-  KeywordInputStatus keywordInputStatus = KeywordInputStatus.read;
+  late KeywordInputStatus keywordInputStatus;
 
   @override
   initState() {
     super.initState();
+
+    keywordInputStatus = widget.autoFocusOnKeywordEdit == true ? KeywordInputStatus.write : KeywordInputStatus.read;
+
     editKeywordAnimation = AnimationController(
         vsync: this,
         duration: const Duration(milliseconds: 500),
@@ -470,7 +476,7 @@ class _HunterIdCardState extends State<HunterIdCard>
                               }
                             },
                             child: TextField(
-                              autofocus: true,
+                              autofocus: widget.autoFocusOnKeywordEdit == true ? true : false,
                               textAlignVertical: TextAlignVertical.top,
                               style: const TextStyle(
                                   fontSize: 24, fontWeight: FontWeight.bold),
