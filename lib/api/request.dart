@@ -18,7 +18,11 @@ class HonmaMeikoInterceptor extends Interceptor {
   @override
   void onResponse(Response response, ResponseInterceptorHandler handler) {
     Model.Response resp = Model.Response.fromJson(response.data);
-    if (resp.code != "200") {
+    var contentType = response.headers.value("Content-Type");
+    if ( contentType is String && contentType == "text/html") {
+      response.data = Map.fromEntries([const MapEntry("type", "html"), MapEntry("data", response.data)]);
+      return handler.next(response);
+    } else if (resp.code != "200") {
       return handler.reject(DioError(requestOptions: response.requestOptions, error: resp.code));
     }
     return handler.next(response);
@@ -53,7 +57,11 @@ class Request {
     try {
       var requestInstance = await Request.getInstance();
       var rawResponse = await requestInstance.request<T>(path, data: data, options: options, queryParameters: queryParameters);
-      return rawResponse.data;
+      var rawData = rawResponse.data;
+      if(rawData is Map &&rawData.containsKey("type") && rawData["type"] == "html" && context is BuildContext) {
+        Navigator.pushNamed (context, "authentication");
+      }
+      return rawData;
     } on DioError catch (e) {
       if (context is BuildContext) {
         final errorMsg = "请求失败, 错误信息:${e.message}";

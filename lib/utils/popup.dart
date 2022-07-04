@@ -41,7 +41,7 @@ class _ToastPopupState extends State<_ToastPopup> with TickerProviderStateMixin 
   initState(){
     controller = AnimationController(
         vsync: this,
-        duration: const Duration( milliseconds: 100),
+        duration: const Duration( milliseconds: 300),
     );
     WidgetsBinding.instance!.addPostFrameCallback((timeStamp) {
       controller.forward();
@@ -61,25 +61,27 @@ class _ToastPopupState extends State<_ToastPopup> with TickerProviderStateMixin 
         right: 80,
         top: 20,
         child: SlideTransition(
-          position: Tween(begin: Offset(0, -2), end: Offset(0, 0)).animate(controller),
-          child: Container(
-            height: 48,
-            padding: EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: widget.containerBgColor,
-              borderRadius: BorderRadius.all(Radius.circular(8)),
-            ),
-            child: Flex(
-              mainAxisSize: MainAxisSize.min,
-              direction: Axis.horizontal,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                widget.icon,
-                DefaultTextStyle(
-                  style: TextStyle(color: widget.textColor),
-                  child: Text(widget.content),
-                )
-              ],
+          position:CurvedAnimation(parent: controller, curve: Curves.bounceIn).drive(Tween(begin: Offset(0, -2), end: Offset(0, 0))),
+          child: SafeArea(
+            child: Container(
+              padding: EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: widget.containerBgColor,
+                borderRadius: BorderRadius.all(Radius.circular(8)),
+              ),
+              child: Wrap(
+                direction: Axis.horizontal,
+                runSpacing: 12,
+                spacing: 12,
+                alignment: WrapAlignment.center,
+                children: [
+                  widget.icon,
+                  DefaultTextStyle(
+                    style: TextStyle(color: widget.textColor),
+                    child: Text(widget.content),
+                  )
+                ],
+              ),
             ),
           ),
         )
